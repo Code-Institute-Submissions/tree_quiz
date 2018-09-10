@@ -27,7 +27,8 @@ def access_user_data(username):
                 cur_player_data = obj
                 
         if past_player == False:
-            cur_player_data = {"name": username,"game_num": 0, "cur_question": 1, "attempt": 1, "cur_score": 0, "high_score": 0}
+            cur_player_data = {"name": username,"game_num": 0, 
+                "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
             all_players_data.append(cur_player_data)
     
     dump_all_player_data ()
@@ -106,14 +107,21 @@ def add_to_score():
        cur_player_data["cur_score"] += 5 
     return cur_player_data["cur_score"]
        
-def prep_next_q(correct, message):
-      
-    if not correct and cur_player_data["attempt"] == 1:
-      cur_player_data["attempt"] = 2
-      
+def prep_next_q(start, correct, message):
+    """
+    Prepares the first/ next question. Pulls in data from tree_lib.json
+    based on information from players.json
+    """
+    if start == True:
+        if cur_player_data["cur_question"] == 0:
+            cur_player_data["cur_question"] = 1
     else:
-      cur_player_data["cur_question"] += 1
-      cur_player_data["attempt"] = 1
+        if not correct and cur_player_data["attempt"] == 1:
+          cur_player_data["attempt"] = 2
+          
+        else:
+          cur_player_data["cur_question"] += 1
+          cur_player_data["attempt"] = 1
        
     cur_question = cur_player_data["cur_question"]
     max_score = (cur_player_data["cur_question"] - 1)*10
@@ -127,11 +135,12 @@ def prep_next_q(correct, message):
        
 def reset_game():
     """
-    Resets the the user game data after final question
+    Resets the the user game data after final question, 
+    Current question set to 1 once game begins
     """
     cur_player_data["cur_score"] = 0
     cur_player_data["attempt"] = 1
-    cur_player_data["cur_question"] = 1
+    cur_player_data["cur_question"] = 0
     cur_player_data["game_num"] += 1
     dump_all_player_data ()
 
@@ -142,7 +151,6 @@ def index():
     """
     # should make test for this
     return render_template("index.html")
-
 
 @app.route('/start/', methods=['GET', 'POST'])
 def start():
@@ -156,16 +164,15 @@ def start():
         # If new user creates info space
         # If returning user access info
         access_user_data(username)
-        cur_question = cur_player_data["cur_question"]
+        # Assign appropriete welcome message
         
-        # Gather the starting quiz info
-        tree_name = get_name(cur_question)
-        tree_image = get_img(cur_question)
-
-        message = "Hello " + username + " do you know the name of this tree?"
-        return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, 
-            message=message, cur_score=cur_player_data["cur_score"],  attempt=cur_player_data["attempt"], cur_question=cur_player_data["cur_question"], max_score=0)
-        
+        if cur_player_data["cur_question"] != 0:
+            message = "Welcome back " + username + ". Looks like you left us mid game. Play on or click Home below to enter another user name"
+        elif cur_player_data["game_num"] != 0:
+            message = "Welcome back " + username + ". Looks like you've played this game before. Best of luck this time around."
+        else:
+            message = "Hello " + username + " do you know the name of this tree?"
+        return prep_next_q(True, True, message)
         
     else:    
         return render_template("index.html")   
@@ -179,10 +186,8 @@ def submit():
     If wrong allows second attempt before moving onto next question
     """
     cur_question = cur_player_data["cur_question"]
-    
-    if request.method == "POST":
-        answer = request.form["answer"]
-        
+    answer = request.form["answer"]
+    if request.method == "POST" and answer != "":
         # If correct there are more questions
         if cur_question < 10:
             # If correct answer move on to next question
@@ -191,17 +196,17 @@ def submit():
                 add_to_score()
                 # Set up the next question     
                 message = "Good job! " + answer.title() + " was the correct answer. How about this one?"    
-                return prep_next_q(True, message)
+                return prep_next_q(False, True, message)
                 
             # If wrong on first attempt, give second attempt
             elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
                 message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
-                return prep_next_q(False, message)
+                return prep_next_q(False, False, message)
             # If wrong on second attempt, move onto next question
             else:
                 tree_name = get_name(cur_question)
                 message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". Might have better look with this one?"
-                return prep_next_q(False, message)
+                return prep_next_q(False, False, message)
         
         # For the final question
         else:
@@ -211,7 +216,7 @@ def submit():
                add_to_score()
                final_score = str(cur_player_data["cur_score"])
                personal_best(final_score)
-               end_message = "Good job! " + answer.title() + "was the correct answer. That was the final question. Your final score was " + final_score + "/100."
+               end_message = "Good job! " + answer.title() + " was the correct answer. That was the final question. Your final score was " + final_score + "/100."
                # reset game
                reset_game()
                return render_template("game_over.html", end_message=end_message)
@@ -219,7 +224,7 @@ def submit():
            # If wrong on first attempt, give second attempt
            elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
                 message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
-                return prep_next_q(False, message)
+                return prep_next_q(False, False, message)
            # If wrong on second attempt, reset game, show Game Over page with appropriete message 
            else:
                 final_score = str(cur_player_data["cur_score"])
