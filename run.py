@@ -94,7 +94,17 @@ def personal_best(final_score):
         return True
     else:
         return False
-        
+
+def reset_game():
+    """
+    Resets the the user game data after final question
+    """
+    cur_player_data["cur_score"] = 0
+    cur_player_data["attempt"] = 1
+    cur_player_data["cur_question"] = 1
+    cur_player_data["game_num"] += 1
+    dump_all_player_data ()
+    
 @app.route('/')
 def index():
     """
@@ -203,16 +213,11 @@ def submit():
                    cur_player_data["cur_score"] += 5
                 
                # Set up the next question  
-               
                final_score = str(cur_player_data["cur_score"])
                personal_best(final_score)
                end_message = "Good job! You were correct the last tree was a " + answer + ". That was the final question. You got " + final_score + "/100."
                # reset game
-               cur_player_data["cur_score"] = 0
-               cur_player_data["attempt"] = 1
-               cur_player_data["cur_question"] = 1
-               cur_player_data["game_num"] += 1
-               dump_all_player_data ()
+               reset_game()
                return render_template("game_over.html", end_message=end_message)
                
            # If wrong on first attempt, give second attempt
@@ -231,14 +236,9 @@ def submit():
            else:
                 final_score = str(cur_player_data["cur_score"])
                 personal_best(final_score)
-                end_message = "Nope it was a " + answer + " either. The game is over the your score was " + final_score + "/100."
+                end_message = "Nope it was not a " + answer + " either. The game is over the your score was " + final_score + "/100."
                 # reset game
-                cur_player_data["cur_score"] = 0
-                cur_player_data["attempt"] = 1
-                cur_player_data["cur_question"] = 1
-
-                
-                dump_all_player_data ()
+                reset_game()
                 return render_template("game_over.html", end_message=end_message)
             
 
