@@ -5,13 +5,16 @@
 </head>
 
 <body>
-    <img class="" src="{{ tree_image }}" alt="Picture of {{ tree_name }}">
+    <p>{{ message }}</p>
+    <p></p>
+    <img class="" src="{{ tree_image }}" alt="Picture of tree">
     <p></p>
     <form method="POST" action="/submit_answer/">
         <label for="answer">Answer:</label>
         <input type="text" id="answer" name="answer">
         <button>Submit Answer!</button>
     </form>
+    
 </body>
 
 </html>

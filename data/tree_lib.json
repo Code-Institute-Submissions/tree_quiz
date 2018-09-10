@@ -2,60 +2,60 @@
         "index": 1,
         "tree_image": "/static/img/arbutus.jpg",
         "tree_name": "arbutus",
-        "hint": "...."
+        "hint": "arbutus hint"
     },
     {
         "index": 2,
         "tree_image": "/static/img/ash.jpg",
         "tree_name": "ash",
-        "hint": "...."
+        "hint": "ash hint"
     },
     {
         "index": 3,
         "tree_image": "/static/img/birch.jpg",
         "tree_name": "birch",
-        "hint": "...."
+        "hint": "birch hint"
     },
     {
         "index": 4,
         "tree_image": "/static/img/hawthorn.jpg",
         "tree_name": "hawthorn",
-        "hint": "...."
+        "hint": "hawthorn hint"
     },
     {
         "index": 5,
         "tree_image": "/static/img/hazel.jpg",
         "tree_name": "hazel",
-        "hint": "...."
+        "hint": "hazel hint"
     },
     {
         "index": 6,
         "tree_image": "/static/img/holly.jpg",
         "tree_name": "holly",
-        "hint": "...."
+        "hint": "holly hint"
     },
     {
         "index": 7,
         "tree_image": "/static/img/oak.jpg",
         "tree_name": "oak",
-        "hint": "...."
+        "hint": "oak hint"
     },
     {
         "index": 8,
         "tree_image": "/static/img/pine.jpg",
         "tree_name": "pine",
-        "hint": "...."
+        "hint": "pine hint"
     },
     {
         "index": 9,
         "tree_image": "/static/img/willow.jpg",
         "tree_name": "willow",
-        "hint": "...."
+        "hint": "willow hint"
     },
     {
         "index": 10,
         "tree_image": "/static/img/yew.jpg",
         "tree_name": "yew",
-        "hint": "...."
+        "hint": "yew hint"
     }
 ]
