@@ -94,7 +94,37 @@ def personal_best(final_score):
         return True
     else:
         return False
-
+        
+def add_to_score():
+    """
+    Increases the current score by 10 if correct on attempt 1
+    Increases the current score by 5 if correct on attemp 2
+    """
+    if cur_player_data["attempt"] == 1:
+       cur_player_data["cur_score"] += 10
+    else:
+       cur_player_data["cur_score"] += 5 
+    return cur_player_data["cur_score"]
+       
+def prep_next_q(correct, message):
+      
+    if not correct and cur_player_data["attempt"] == 1:
+      cur_player_data["attempt"] = 2
+      
+    else:
+      cur_player_data["cur_question"] += 1
+      cur_player_data["attempt"] = 1
+       
+    cur_question = cur_player_data["cur_question"]
+    max_score = (cur_player_data["cur_question"] - 1)*10
+    tree_name = get_name(cur_question)
+    tree_image = get_img(cur_question)
+    cur_score=cur_player_data["cur_score"]
+    attempt=cur_player_data["attempt"]
+    dump_all_player_data ()
+    return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, message=message, 
+        cur_score=cur_score, attempt=attempt, cur_question=cur_question, max_score=max_score)
+       
 def reset_game():
     """
     Resets the the user game data after final question
@@ -104,7 +134,7 @@ def reset_game():
     cur_player_data["cur_question"] = 1
     cur_player_data["game_num"] += 1
     dump_all_player_data ()
-    
+
 @app.route('/')
 def index():
     """
@@ -157,86 +187,45 @@ def submit():
         if cur_question < 10:
             # If correct answer move on to next question
             if check_answer(cur_question, answer) == True:
-                
-                # Add to the running score, half points for second attempt
-                if cur_player_data["attempt"] == 1:
-                    cur_player_data["cur_score"] += 10
-                else:
-                    cur_player_data["cur_score"] += 5
-                
+                # Increase current score approprietly 
+                add_to_score()
                 # Set up the next question     
-                message = "Good job! You were correct the last tree was a " + answer + ". How about this one?"    
-                cur_player_data["cur_question"] += 1
-                cur_player_data["attempt"] = 1
-                cur_question = cur_player_data["cur_question"]
-                tree_name = get_name(cur_question)
-                tree_image = get_img(cur_question)
-                max_score = (cur_player_data["cur_question"] - 1)*10
-                dump_all_player_data ()
-                return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, 
-                    message=message, cur_score=cur_player_data["cur_score"], attempt=cur_player_data["attempt"], cur_question=cur_player_data["cur_question"], max_score=max_score)
-            
+                message = "Good job! " + answer.title() + " was the correct answer. How about this one?"    
+                return prep_next_q(True, message)
+                
             # If wrong on first attempt, give second attempt
             elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
-                message = "Ooops! Sorry that is not a " + answer + ". How about another guess?"
-                cur_player_data["attempt"] = 2
-                cur_question = cur_player_data["cur_question"]
-                tree_name = get_name(cur_question)
-                tree_image = get_img(cur_question)
-                max_score = (cur_player_data["cur_question"] - 1)*10
-                dump_all_player_data ()
-                return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, 
-                    message=message, cur_score=cur_player_data["cur_score"], attempt=cur_player_data["attempt"], cur_question=cur_player_data["cur_question"], max_score=max_score)
-            
+                message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
+                return prep_next_q(False, message)
             # If wrong on second attempt, move onto next question
             else:
-                message = "Nope it was not a " + answer + " either. Might have better look with this one?"
-                cur_player_data["attempt"] = 1
-                cur_player_data["cur_question"] += 1
-                cur_question = cur_player_data["cur_question"]
                 tree_name = get_name(cur_question)
-                tree_image = get_img(cur_question)
-                max_score = (cur_player_data["cur_question"] - 1)*10
-                dump_all_player_data ()
-                return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, 
-                    message=message, cur_score=cur_player_data["cur_score"], attempt=cur_player_data["attempt"], cur_question=cur_player_data["cur_question"], max_score=max_score)
+                message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". Might have better look with this one?"
+                return prep_next_q(False, message)
         
         # For the final question
         else:
            # If correct reset game, show Game Over page with appropriete message
            if check_answer(cur_question, answer) == True:
-               
-               # Add to the running score, half points for second attempt
-               if cur_player_data["attempt"] == 1:
-                   cur_player_data["cur_score"] += 10
-               else:
-                   cur_player_data["cur_score"] += 5
-                
-               # Set up the next question  
+               # Increase current score approprietly 
+               add_to_score()
                final_score = str(cur_player_data["cur_score"])
                personal_best(final_score)
-               end_message = "Good job! You were correct the last tree was a " + answer + ". That was the final question. You got " + final_score + "/100."
+               end_message = "Good job! " + answer.title() + "was the correct answer. That was the final question. Your final score was " + final_score + "/100."
                # reset game
                reset_game()
                return render_template("game_over.html", end_message=end_message)
                
            # If wrong on first attempt, give second attempt
            elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
-                message = "Ooops! Sorry that is not a " + answer + ". How about another guess?"
-                cur_player_data["attempt"] = 2
-                cur_question = cur_player_data["cur_question"]
-                tree_name = get_name(cur_question)
-                tree_image = get_img(cur_question)
-                max_score = (cur_player_data["cur_question"] - 1)*10
-                dump_all_player_data ()
-                return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, 
-                    message=message, cur_score=cur_player_data["cur_score"], attempt=cur_player_data["attempt"], cur_question=cur_player_data["cur_question"], max_score=max_score)
-                
+                message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
+                return prep_next_q(False, message)
            # If wrong on second attempt, reset game, show Game Over page with appropriete message 
            else:
                 final_score = str(cur_player_data["cur_score"])
                 personal_best(final_score)
-                end_message = "Nope it was not a " + answer + " either. The game is over the your score was " + final_score + "/100."
+                tree_name = get_name(cur_question)
+                end_message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". The game is over the your score was " + final_score + "/100."
                 # reset game
                 reset_game()
                 return render_template("game_over.html", end_message=end_message)
