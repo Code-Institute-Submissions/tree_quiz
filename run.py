@@ -143,6 +143,53 @@ def reset_game():
     cur_player_data["cur_question"] = 0
     cur_player_data["game_num"] += 1
     dump_all_player_data ()
+    
+def add_to_leader_board(name, score, game_num):
+    """
+    The leader board will show the top 5 players. This function fills the the 
+    top 5 slots and saves them in leader_board.json. 
+    """
+    with open("data/leader_board.json", "r") as json_leader_board:
+        leader = json.load(json_leader_board)
+    len_leader = len(leader)
+    
+    # Leader board not empty
+    if len_leader < 3:
+        leader.append(name)
+        leader.append(score)
+        leader.append(game_num)
+        
+    # Leader board not full    
+    elif len_leader <  15:
+        # Score not greater than other scores, append to end
+        if score < int(min(leader)):
+            leader.append(name)
+            leader.append(score)
+            leader.append(game_num)
+        # Score greater than score on board
+        else:
+            for n in range(1, len_leader, 3):
+                if score > int(leader[n]):
+                    leader.insert(n-1,game_num)
+                    leader.insert(n-1, score)
+                    leader.insert(n-1, name)
+                    break
+    
+    # Leader board full and score is knocking someone out of the board
+    elif score > int(min(leader)):
+        del leader[len_leader-3:len_leader]
+        # Working from highest to lowest, what is the highest rank can be put in
+        for n in range(1, len_leader-3, 3):
+            if score > int(leader[n]):
+                print(n)
+                leader.insert(n-1,game_num)
+                leader.insert(n-1, score)
+                leader.insert(n-1, name)
+                break
+    
+    with open("data/leader_board.json", "w") as json_leader_board:           
+            json.dump(leader, json_leader_board)
+
 
 @app.route('/')
 def index():
@@ -187,7 +234,7 @@ def submit():
     """
     cur_question = cur_player_data["cur_question"]
     answer = request.form["answer"]
-    if request.method == "POST" and answer != "":
+    if request.method == "POST":
         # If correct there are more questions
         if cur_question < 10:
             # If correct answer move on to next question
@@ -214,9 +261,12 @@ def submit():
            if check_answer(cur_question, answer) == True:
                # Increase current score approprietly 
                add_to_score()
-               final_score = str(cur_player_data["cur_score"])
-               personal_best(final_score)
-               end_message = "Good job! " + answer.title() + " was the correct answer. That was the final question. Your final score was " + final_score + "/100."
+               final_score = cur_player_data["cur_score"]
+               final_score_str = str(cur_player_data["cur_score"])
+               if personal_best(final_score):
+                    print("break 1")
+                    add_to_leader_board(cur_player_data["name"], final_score, cur_player_data["game_num"])
+               end_message = "Good job! " + answer.title() + " was the correct answer. That was the final question. Your final score was " + final_score_str + "/100."
                # reset game
                reset_game()
                return render_template("game_over.html", end_message=end_message)
@@ -227,11 +277,14 @@ def submit():
                 return prep_next_q(False, False, message)
            # If wrong on second attempt, reset game, show Game Over page with appropriete message 
            else:
-                final_score = str(cur_player_data["cur_score"])
-                personal_best(final_score)
+                final_score = cur_player_data["cur_score"]
+                final_score_str = str(cur_player_data["cur_score"])
+                if personal_best(final_score):
+                    add_to_leader_board(cur_player_data["name"], final_score, cur_player_data["cur_score"])
                 tree_name = get_name(cur_question)
-                end_message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". The game is over the your score was " + final_score + "/100."
+                end_message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". The game is over the your score was " + final_score_str + "/100."
                 # reset game
+                
                 reset_game()
                 return render_template("game_over.html", end_message=end_message)
             
@@ -242,6 +295,16 @@ def go_home():
     Redirects to home page
     """
     return render_template("index.html")
+    
+@app.route('/leader_board/', methods=['GET', 'POST'])
+def go_leader_board(): 
+    """
+    Redirects to leader_board
+    """
+    with open("data/leader_board.json", "r") as json_leader_board:
+        leader = json.load(json_leader_board)
+    return render_template("leader.html", leader=leader)
+    
     
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
