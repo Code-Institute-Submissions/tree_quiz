@@ -1,26 +1,25 @@
-<html>
-
-<head>
-    <title>Quiz</title>
-</head>
-
-<body>
-    <p>Question: {{ cur_question }}/10</p>
-    <p>Attempt: {{ attempt }}</p>
-    <p>Score: {{ cur_score }}/{{ max_score }}</p>
-    <p>{{ message }}</p>
-    <p></p>
-    <img class="" src="{{ tree_image }}" alt="Picture of tree">
-    <p></p>
-    <form method="POST" action="/submit_answer/">
-        <label for="answer">Answer:</label>
-        <input type="text" id="answer" name="answer">
-        <button>Submit Answer!</button>
-    </form>
-    <form method="POST" action="/home/">
-        <button>Home</button>
-    </form>
+{% extends 'base.html' %}
+{% block content %}
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Question: {{ cur_question }}/10</h3>
+            </div>
+            <div class="col-md-4">
+                <h3>Attempt: {{ attempt }}</h3>
+            </div>
+            <div class="col-md-4">
+                <h3>Score: {{ cur_score }}/{{ max_score }}</h3>
+            </div>
+        </div>
+        
     
-</body>
-
-</html>
+        <p>{{ message }}</p>
+        <p></p>
+        <img class="" src="{{ tree_image }}" alt="Picture of tree">
+        <p></p>
+        <form method="POST" action="/submit/">
+            <label for="answer">Answer:</label>
+            <input type="text" id="answer" name="answer">
+            <button class="btn">Submit Answer!</button>
+        </form>
+{% endblock %}

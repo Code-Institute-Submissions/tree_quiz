@@ -1,6 +1,7 @@
 import os
 import json
 from flask import Flask, render_template, request, flash
+from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 
@@ -130,8 +131,9 @@ def prep_next_q(start, correct, message):
     cur_score=cur_player_data["cur_score"]
     attempt=cur_player_data["attempt"]
     dump_all_player_data ()
-    return render_template("quiz.html", tree_image=tree_image, tree_name=tree_name, message=message, 
-        cur_score=cur_score, attempt=attempt, cur_question=cur_question, max_score=max_score)
+    return render_template("quiz.html", tree_image=tree_image, 
+        tree_name=tree_name, message=message, cur_score=cur_score, 
+        attempt=attempt, cur_question=cur_question, max_score=max_score)
        
 def reset_game():
     """
@@ -214,9 +216,11 @@ def start():
         # Assign appropriete welcome message
         
         if cur_player_data["cur_question"] != 0:
-            message = "Welcome back " + username + ". Looks like you left us mid game. Play on or click Home below to enter another user name"
+            message = ("Welcome back " + username 
+                + ". Looks like you left us mid game. Play on or click Home below to enter another user name")
         elif cur_player_data["game_num"] != 0:
-            message = "Welcome back " + username + ". Looks like you've played this game before. Best of luck this time around."
+            message = ("Welcome back " + username 
+                + ". Looks like you've played this game before. Best of luck this time around.")
         else:
             message = "Hello " + username + " do you know the name of this tree?"
         return prep_next_q(True, True, message)
@@ -225,7 +229,7 @@ def start():
         return render_template("index.html")   
         
         
-@app.route('/submit_answer/', methods=['GET', 'POST'])
+@app.route('/submit/', methods=['GET', 'POST'])
 def submit():
     """
     Submits the answer to the current question.Submits
@@ -242,7 +246,8 @@ def submit():
                 # Increase current score approprietly 
                 add_to_score()
                 # Set up the next question     
-                message = "Good job! " + answer.title() + " was the correct answer. How about this one?"    
+                message = ("Good job! " + answer.title() 
+                    + " was the correct answer. How about this one?")    
                 return prep_next_q(False, True, message)
                 
             # If wrong on first attempt, give second attempt
@@ -252,7 +257,8 @@ def submit():
             # If wrong on second attempt, move onto next question
             else:
                 tree_name = get_name(cur_question)
-                message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". Might have better look with this one?"
+                message = (answer.title()  + " was not correct. The correct answer was " 
+                    + tree_name + ". Might have better look with this one?")
                 return prep_next_q(False, False, message)
         
         # For the final question
@@ -265,11 +271,16 @@ def submit():
                final_score_str = str(cur_player_data["cur_score"])
                if personal_best(final_score):
                     print("break 1")
-                    add_to_leader_board(cur_player_data["name"], final_score, cur_player_data["game_num"])
-               end_message = "Good job! " + answer.title() + " was the correct answer. That was the final question. Your final score was " + final_score_str + "/100."
+                    add_to_leader_board(cur_player_data["name"], 
+                        final_score, cur_player_data["game_num"])
+               end_message = ("Good job! " + answer.title() 
+                + " was the correct answer. That was the final question. Your final score was " 
+                + final_score_str + "/100.")
                # reset game
                reset_game()
-               return render_template("game_over.html", end_message=end_message)
+               with open("data/leader_board.json", "r") as json_leader_board:
+                    leader = json.load(json_leader_board)
+               return render_template("game_over.html", end_message=end_message, leader=leader)
                
            # If wrong on first attempt, give second attempt
            elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
@@ -282,28 +293,32 @@ def submit():
                 if personal_best(final_score):
                     add_to_leader_board(cur_player_data["name"], final_score, cur_player_data["cur_score"])
                 tree_name = get_name(cur_question)
-                end_message = answer.title()  + " was not correct. The correct answer was " + tree_name + ". The game is over the your score was " + final_score_str + "/100."
+                end_message = (answer.title()  + " was not correct. The correct answer was " 
+                    + tree_name + ". The game is over the your score was " 
+                    + final_score_str + "/100.")
                 # reset game
                 
                 reset_game()
-                return render_template("game_over.html", end_message=end_message)
+                with open("data/leader_board.json", "r") as json_leader_board:
+                    leader = json.load(json_leader_board)
+                return render_template("game_over.html", end_message=end_message, leader=leader, page_title="Game_Over")
             
 
-@app.route('/home/', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 def go_home(): 
     """
     Redirects to home page
     """
     return render_template("index.html")
     
-@app.route('/leader_board/', methods=['GET', 'POST'])
-def go_leader_board(): 
+@app.route('/leader', methods=['GET', 'POST'])
+def leader(): 
     """
     Redirects to leader_board
     """
     with open("data/leader_board.json", "r") as json_leader_board:
         leader = json.load(json_leader_board)
-    return render_template("leader.html", leader=leader)
+    return render_template("leader.html", leader=leader, page_title="Leaderboard")
     
     
 if __name__ == '__main__':

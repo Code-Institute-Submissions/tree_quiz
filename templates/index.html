@@ -1,19 +1,8 @@
-<html>
-
-<head>
-    <title>Home Page</title>
-</head>
-
-<body>
+{% extends 'base.html' %} 
+{% block content %}
     <form method="POST" action="/start/">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username">
-        <button>Join the Game!</button>
+        <button class="btn">Join the Game!</button>
     </form>
-        <form method="POST" action="/leader_board/">
-        <button>Leader Board</button>
-    </form>
-    
-</body>
-
-</html>
+{% endblock %}
