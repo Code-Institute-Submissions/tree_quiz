@@ -1,8 +1,22 @@
 {% extends 'base.html' %} 
 {% block content %}
-    <form method="POST" action="/start/">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username">
-        <button class="btn">Join the Game!</button>
-    </form>
+<div class="col-md-8 col-md-offset-2 index_content">
+    <div class="pre-info">
+        <h2>Tree Quiz</h2>
+        <h3>Do you know your Irish tree's? <br> Sign in and take the quiz!</h3>
+        <p>If you have already played, just enter the same username to continue where you left off</p>
+    </div>
+    <div class="sign-in">
+        <form method="POST" action="/start/">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+            <button class="btn">Join the Game!</button>
+        </form>
+    </div>
+    <div class="extra-info">
+        <p>Hi (user,), looks like this is your first game. This game consists of 10 images of trees native of Ireland. 
+        Just type the name of the tree into the answer box.You will get two attempts per images. 10 points if you get 
+        it right on the first go, 5 points if you get it on the second.Ready?</p>
+    </div>
+</div>
 {% endblock %}

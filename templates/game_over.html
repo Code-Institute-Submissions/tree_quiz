@@ -1,48 +1,52 @@
 {% extends 'base.html' %} {% block content %}
-
-    <p>{{ end_message }}</p>
-    
-        <table class="table leaderboard-table">
+<div class="col-md-8 col-md-offset-2 game_over_content">
+    <div class"game_over_msg_container col-xs-12">  
+        <p>{{ end_message }}</p>
+    </div>
+    <div class"leader_board_1 col-xs-12">
+        <h2>Leader Board</h2>
+        <table class="table leaderboard-table col-md-8 col-md-offset-2">
         <tbody>
             <tr>
-                <th>Rank</th>
-                <th>Username</th>
-                <th>High Score</th>
-                <th>Game No.</th>
+                <th class="table_row">Rank</th>
+                <th class="table_row">Username</th>
+                <th class="table_row">High Score</th>
+                <th class="table_row">Game No.</th>
             </tr>
             
             <tr>
-                <td>1</td>
-                <td>{{ leader[0] }}</td>
-                <td>{{ leader[1] }}</td>
-                <td>{{ leader[2] }}</td>
+                <td class="table_row">1</td>
+                <td class="table_row">{{ leader[0] }}</td>
+                <td class="table_row">{{ leader[1] }}</td>
+                <td class="table_row">{{ leader[2] }}</td>
             </tr>
             <tr>
-                <td>2</td>
-                <td>{{ leader[3] }}</td>
-                <td>{{ leader[4] }}</td>
-                <td>{{ leader[5] }}</td>
+                <td class="table_row">2</td>
+                <td class="table_row">{{ leader[3] }}</td>
+                <td class="table_row">{{ leader[4] }}</td>
+                <td class="table_row">{{ leader[5] }}</td>
             </tr>
             <tr>
-                <td>3</td>
-                <td>{{ leader[6] }}</td>
-                <td>{{ leader[7] }}</td>
-                <td>{{ leader[8] }}</td>
+                <td class="table_row">3</td>
+                <td class="table_row">{{ leader[6] }}</td>
+                <td class="table_row">{{ leader[7] }}</td>
+                <td class="table_row">{{ leader[8] }}</td>
             </tr>
             <tr>
-                <td>4</td>
-                <td>{{ leader[9] }}</td>
-                <td>{{ leader[10] }}</td>
-                <td>{{ leader[11] }}</td>
+                <td class="table_row">4</td>
+                <td class="table_row">{{ leader[9] }}</td>
+                <td class="table_row">{{ leader[10] }}</td>
+                <td class="table_row">{{ leader[11] }}</td>
             </tr>
             <tr>
-                <td>5</td>
-                <td>{{ leader[12] }}</td>
-                <td>{{ leader[13] }}</td>
-                <td>{{ leader[14] }}</td>
+                <td class="table_row">5</td>
+                <td class="table_row">{{ leader[12] }}</td>
+                <td class="table_row">{{ leader[13] }}</td>
+                <td class="table_row">{{ leader[14] }}</td>
             </tr>
             
         </tbody>
-    </table>
-    
+            </table>
+    </div>
+</div>   
 {% endblock %}
