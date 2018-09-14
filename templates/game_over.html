@@ -1,11 +1,13 @@
 {% extends 'base.html' %} {% block content %}
 <div class="col-md-8 col-md-offset-2 game_over_content">
     <div class"game_over_msg_container col-xs-12">  
-        <p>{{ end_message }}</p>
+        <p>{{ message }}</p>
+        <h1>You Scored {{ final_score_str }}/100</h1>
+        <p> {{ result_msg }} </p>
     </div>
     <div class"leader_board_1 col-xs-12">
         <h2>Leader Board</h2>
-        <table class="table leaderboard-table col-md-8 col-md-offset-2">
+        <table class="table leaderboard-table">
         <tbody>
             <tr>
                 <th class="table_row">Rank</th>

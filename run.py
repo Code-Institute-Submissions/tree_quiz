@@ -84,7 +84,7 @@ def check_answer(index, answer):
                 return True
             elif obj["index"] == index and obj["tree_name"] != answer:
                 return False
-
+    
 def personal_best(final_score):
     """
     Checks if the final score of the game is greater than the users
@@ -144,22 +144,28 @@ def reset_game():
     cur_player_data["cur_question"] = 0
     cur_player_data["game_num"] += 1
     dump_all_player_data ()
-    
+
+"""    
 def add_to_leader_board(name, score, game_num):
-    """
+"""
+"""
     The leader board will show the top 5 players. This function fills the the 
     top 5 slots and saves them in leader_board.json. 
     """
+"""
+    made_leader = False
+    
     with open("data/leader_board.json", "r") as json_leader_board:
         leader = json.load(json_leader_board)
+        
     len_leader = len(leader)
     
-    # Leader board not empty
+    # Leader board empty
     if len_leader < 3:
         leader.append(name)
         leader.append(score)
         leader.append(game_num)
-        
+        made_leader = True
     # Leader board not full    
     elif len_leader <  15:
         # Score not greater than other scores, append to end
@@ -167,6 +173,7 @@ def add_to_leader_board(name, score, game_num):
             leader.append(name)
             leader.append(score)
             leader.append(game_num)
+            made_leader = True
         # Score greater than score on board
         else:
             for n in range(1, len_leader, 3):
@@ -174,6 +181,7 @@ def add_to_leader_board(name, score, game_num):
                     leader.insert(n-1,game_num)
                     leader.insert(n-1, score)
                     leader.insert(n-1, name)
+                    made_leader = True
                     break
     
     # Leader board full and score is knocking someone out of the board
@@ -186,12 +194,114 @@ def add_to_leader_board(name, score, game_num):
                 leader.insert(n-1,game_num)
                 leader.insert(n-1, score)
                 leader.insert(n-1, name)
+                made_leader = True
                 break
     
     with open("data/leader_board.json", "w") as json_leader_board:           
             json.dump(leader, json_leader_board)
+            
+    return made_leader, leader
+    """
+def add_to_leader_board(name, score, game_num, leader):
+    """
+    The leader board will show the top 5 players. This function fills the the 
+    top 5 slots and saves them in leader_board.json. 
+    """
+    made_leader = False
+    len_leader = len(leader)
+    leader_scores=[]
+    
+    # Create a list of the scores on the leaderboard
+    for n in range(1, len(leader),3):
+        leader_scores.append(leader[n])
 
-
+    # Leader board empty
+    # Add user to leaderboard
+    if len_leader < 3:
+        leader.append(name)
+        leader.append(score)
+        leader.append(game_num)
+        made_leader = True
+    # Leaderboard not full    
+    elif len_leader <  15:
+        # Score not greater than other scores
+        # Add user to end of leaderboard
+        if score < int(min(leader_scores)):
+            leader.append(name)
+            leader.append(score)
+            leader.append(game_num)
+            made_leader = True
+        # Score greater than score on leaderboard
+        # Working from highest to lowest, insert player into highest rank
+        else:
+            for n in range(len_leader-2, 0, -3):
+                if score >= int(leader[n]):
+                    print(n)
+                    leader.insert(n+2, game_num)
+                    leader.insert(n+2, score)
+                    leader.insert(n+2, name)
+                    made_leader = True
+                    break
+            
+    # Leaderboard full, but final score made it onto leaderboard
+    # Working from highest to lowest, insert player into highest rank
+    elif score >= min(leader_scores):
+        del leader[0:3]
+        len_leader=len(leader)
+        for n in range(len_leader-2, 0, -3):
+            if score >= int(leader[n]):
+                
+                leader.insert(n+2,game_num)
+                leader.insert(n+2, score)
+                leader.insert(n+2, name)
+                made_leader = True
+                break
+    
+    return made_leader, leader
+    
+def evaluate_result(final_score,user_info):
+    
+    # Read in leaderboard
+    with open("data/leader_board.json", "r") as json_leader_board:
+        leader = json.load(json_leader_board)
+    # Scored 0   
+    if final_score ==0:
+        leader = leader
+        result_msg = "You can do better than 0. Try again. Takes a few goes to get them right."
+    # First game, full marks
+    elif user_info["game_num"] == 0 and final_score == 100:
+        user_info["high_score"] = final_score
+        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        result_msg = "Congradulations! You got top marks on your first game. You are on the leaderboard"
+    # First game, scored between 0 and 100
+    elif user_info["game_num"] == 0 and final_score < 100:
+        user_info["high_score"] = final_score
+        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        # Score made it onto leaderboard
+        if made_leader:
+            result_msg = "Excelent! First game and you made it on the leaderboard."
+        # Score did not make it onto leaderboard
+        else:
+            result_msg = "Good first try. Have another game and try to make it onto leaderboard."
+    # Played before, personnel best
+    elif final_score > user_info["high_score"]:
+        user_info["high_score"] = final_score
+        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        # Score made it onto leaderboard
+        if made_leader:
+            result_msg = "Excelent! That is a personnel best and you made it to leaderboard"
+        # Score did not make it onto leaderboard
+        else:
+            result_msg = "You are improving. Keep trying to get top marks."
+    else:
+        # Scored less than personnel high score
+        leader = leader
+        result_msg = "Good job, but you didn't beat your own top score of " + str(user_info["high_score"])
+    
+    with open("data/leader_board.json", "w") as json_leader_board:           
+        json.dump(leader, json_leader_board)
+    return result_msg, leader
+    
 @app.route('/')
 def index():
     """
@@ -268,18 +378,15 @@ def submit():
                add_to_score()
                final_score = cur_player_data["cur_score"]
                final_score_str = str(cur_player_data["cur_score"])
-               if personal_best(final_score):
-                    print("break 1")
-                    add_to_leader_board(cur_player_data["name"], 
-                        final_score, cur_player_data["game_num"])
-               end_message = ("Good job! " + answer.title() 
-                + " was the correct answer. That was the final question. Your final score was " 
-                + final_score_str + "/100.")
+               message = ("Good job! " + answer.title() 
+                + " was the correct answer. That was the final question.")
+               result_msg, leader = evaluate_result(final_score, cur_player_data)
+               
                # reset game
                reset_game()
                with open("data/leader_board.json", "r") as json_leader_board:
                     leader = json.load(json_leader_board)
-               return render_template("game_over.html", end_message=end_message, leader=leader)
+               return render_template("game_over.html", message=message, final_score_str=final_score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
                
            # If wrong on first attempt, give second attempt
            elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
@@ -289,26 +396,18 @@ def submit():
            else:
                 final_score = cur_player_data["cur_score"]
                 final_score_str = str(cur_player_data["cur_score"])
-                if personal_best(final_score):
-                    add_to_leader_board(cur_player_data["name"], final_score, cur_player_data["cur_score"])
                 tree_name = get_name(cur_question)
-                end_message = (answer.title()  + " was not correct. The correct answer was " 
-                    + tree_name + ". The game is over the your score was " 
-                    + final_score_str + "/100.")
-                # reset game
+                message = (answer.title()  + " was not correct. The correct answer was " 
+                    + tree_name + ". That was the final qustion.")
                 
+                result_msg, leader = evaluate_result(final_score, cur_player_data)
+             
+                # reset game
                 reset_game()
                 with open("data/leader_board.json", "r") as json_leader_board:
                     leader = json.load(json_leader_board)
-                return render_template("game_over.html", end_message=end_message, leader=leader, page_title="Game_Over")
-            
+                return render_template("game_over.html", message=message,  final_score_str=final_score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
 
-@app.route('/home', methods=['GET', 'POST'])
-def go_home(): 
-    """
-    Redirects to home page
-    """
-    return render_template("index.html")
     
 @app.route('/leader', methods=['GET', 'POST'])
 def leader(): 
