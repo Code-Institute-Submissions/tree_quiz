@@ -6,6 +6,50 @@ import json
 from flask import Flask, render_template, request, flash
 
 class TestQuiz(unittest.TestCase):
+    
+    def test_get_cur_player_data(self):
+        """
+        If the username has been used before returns the user info,
+        else adds the new new users info to the all_player_data list
+        """
+        # Check: Empty player data, add user
+        all_player_data_old = []
+        cur_player_data = {"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        all_player_data_new = [{"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
+        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
+        
+        # Check: 2 players, user new played
+        all_player_data_old = [{"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}]
+        cur_player_data = {"name": "name3","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        all_player_data_new = [{"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
+        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name3", all_player_data_old))
+        # Check: 3 players, user has played before
+        all_player_data_old = [{"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}]
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
+        all_player_data_new = all_player_data_old
+        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
+        # Check: Username not case sensitive
+        all_player_data_old = [{"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}]
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
+        all_player_data_new = all_player_data_old
+        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("NamE1", all_player_data_old))
+        
     def test_get_q_data(self):
         """
         Test test_get_q_data(index). Gets the tree name and url of tree image
@@ -32,6 +76,21 @@ class TestQuiz(unittest.TestCase):
         self.assertFalse(run.check_answer(2,"arbutus"))
         # Check accepts captialized
         self.assertTrue(run.check_answer(1,"ArbuTus"))
+    
+    def test_add_to_score(self):
+        """
+        Test if first attemp current score gets incremented by 10, else
+        gets incremented by 5
+        """
+        cur_player_data = {"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        new_cur_player_data = run.add_to_score(cur_player_data)
+        self.assertEquals(new_cur_player_data["cur_score"], 10)
+        cur_player_data = {"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 2, "cur_score": 10, "high_score": 0}
+        new_cur_player_data = run.add_to_score(cur_player_data)
+        self.assertEquals(new_cur_player_data["cur_score"], 15)
+        
     
     def test_add_to_leaderboard(self):
         """

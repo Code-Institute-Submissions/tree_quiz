@@ -4,47 +4,47 @@ from flask import Flask, render_template, request, flash
 
 app = Flask(__name__)
 
-def access_user_data(username):
+# Tested
+def get_cur_player_data(username, all_players_data):
     """
-    Module takes in username as input, checks players.json database to see
-    the username has been used before. Either increments the number of games
-    played or adds a new username to the players database.
-    Requires player.json file to contain list, either empty or occupied.
+    Module checks if username has been used before. If Yes then returns the user info,
+    if No adds the new new users info to the all_player_data list
     """
-    global all_players_data
-    global glob_cur_player_data
-    
     username = username.lower()
     past_player = False
     
+    for obj in all_players_data:
+        if obj["name"] == username:
+            past_player = True
+            cur_player_data = obj
+            
+    if past_player == False:
+        cur_player_data = {"name": username,"game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        all_players_data.append(cur_player_data)
+    
+    return cur_player_data, all_players_data
+# little point in testing
+def get_all_player_data():
+    """
+    Gets player all player data players.json
+    """
     with open("data/players.json", "r") as json_player_data:
-        all_players_data = json.load(json_player_data)
-        
+            all_players_data = json.load(json_player_data)
+    return all_player_data
 
-        for obj in all_players_data:
-            if obj["name"] == username:
-                past_player = True
-                cur_player_data = obj
-                
-        if past_player == False:
-            cur_player_data = {"name": username,"game_num": 0, 
-                "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
-            all_players_data.append(cur_player_data)
-    
-    glob_cur_player_data = cur_player_data
-    dump_all_player_data ()
-    return cur_player_data
-    
-def dump_all_player_data (): 
+# little point in testing   
+def dump_all_player_data (all_players_data): 
     """
     Dumps the player data back into players.json
     """
     with open("data/players.json", "w") as json_player_data:           
         json.dump(all_players_data, json_player_data)
-
+        
+# tested
 def get_q_data(index):
     """
-    Get the tree name and image address for the current question
+    Gets the tree name and image address for the current question
     """
     with open("data/tree_lib.json", "r") as json_quiz_data:
         quiz_data = json.load(json_quiz_data)
@@ -57,7 +57,8 @@ def get_q_data(index):
                 tree_image = obj["tree_image"]
                 
         return tree_name, tree_image
-    
+
+# tested   
 def check_answer(index, answer):
     """
     Checks if the answer submited is correct. Returns True or False
@@ -68,19 +69,8 @@ def check_answer(index, answer):
         return True
     else:
         return False
-    
-    """    
-    with open("data/tree_lib.json", "r") as json_quiz_data:
-        quiz_data = json.load(json_quiz_data)
-        
 
-        for obj in quiz_data:
-            if obj["index"] == index and obj["tree_name"] == answer:
-                return True
-            elif obj["index"] == index and obj["tree_name"] != answer:
-                return False
-    """
-        
+# tested        
 def add_to_score(cur_player_data):
     """
     Increases the current score by 10 if correct on attempt 1
@@ -130,6 +120,7 @@ def reset_game(cur_player_data):
     glob_cur_player_data = cur_player_data
     dump_all_player_data ()
 
+# tested
 def add_to_leaderboard(cur_player_data, leader):
     """
     The leader board will show the top 5 players. This function fills the the 
@@ -253,12 +244,22 @@ def start():
     Accepts username entry, accesses/ creates the user info and 
     initiates quiz
     """
+    global glob_all_players_data
+    global glob_cur_player_data
+    
     username = request.form["username"]
     if request.method == "POST" and username != "":
         
         # If new user creates info space
         # If returning user access info
-        cur_player_data = access_user_data(username)
+        all_players_data = get_all_player_data()
+
+        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        glob_all_player_data = all_players_data
+        glob_cur_player_data = cur_player_data
+        
+        dump_all_player_data(all_players_data)
+        
         # Assign appropriete welcome message
         
         if cur_player_data["cur_question"] != 0:
