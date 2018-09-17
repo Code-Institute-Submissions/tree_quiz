@@ -84,17 +84,6 @@ def check_answer(index, answer):
                 return True
             elif obj["index"] == index and obj["tree_name"] != answer:
                 return False
-    
-def personal_best(final_score):
-    """
-    Checks if the final score of the game is greater than the users
-    current high score, if yes replace
-    """
-    if final_score > cur_player_data["high_score"]:
-        cur_player_data["high_score"] = final_score
-        return True
-    else:
-        return False
         
 def add_to_score():
     """
@@ -145,64 +134,7 @@ def reset_game():
     cur_player_data["game_num"] += 1
     dump_all_player_data ()
 
-"""    
-def add_to_leader_board(name, score, game_num):
-"""
-"""
-    The leader board will show the top 5 players. This function fills the the 
-    top 5 slots and saves them in leader_board.json. 
-    """
-"""
-    made_leader = False
-    
-    with open("data/leader_board.json", "r") as json_leader_board:
-        leader = json.load(json_leader_board)
-        
-    len_leader = len(leader)
-    
-    # Leader board empty
-    if len_leader < 3:
-        leader.append(name)
-        leader.append(score)
-        leader.append(game_num)
-        made_leader = True
-    # Leader board not full    
-    elif len_leader <  15:
-        # Score not greater than other scores, append to end
-        if score < int(min(leader)):
-            leader.append(name)
-            leader.append(score)
-            leader.append(game_num)
-            made_leader = True
-        # Score greater than score on board
-        else:
-            for n in range(1, len_leader, 3):
-                if score > int(leader[n]):
-                    leader.insert(n-1,game_num)
-                    leader.insert(n-1, score)
-                    leader.insert(n-1, name)
-                    made_leader = True
-                    break
-    
-    # Leader board full and score is knocking someone out of the board
-    elif score > int(min(leader)):
-        del leader[len_leader-3:len_leader]
-        # Working from highest to lowest, what is the highest rank can be put in
-        for n in range(1, len_leader-3, 3):
-            if score > int(leader[n]):
-                print(n)
-                leader.insert(n-1,game_num)
-                leader.insert(n-1, score)
-                leader.insert(n-1, name)
-                made_leader = True
-                break
-    
-    with open("data/leader_board.json", "w") as json_leader_board:           
-            json.dump(leader, json_leader_board)
-            
-    return made_leader, leader
-    """
-def add_to_leader_board(name, score, game_num, leader):
+def add_to_leaderboard(user_info, leader):
     """
     The leader board will show the top 5 players. This function fills the the 
     top 5 slots and saves them in leader_board.json. 
@@ -211,6 +143,10 @@ def add_to_leader_board(name, score, game_num, leader):
     len_leader = len(leader)
     leader_scores=[]
     
+    name = user_info["name"]
+    score = user_info["high_score"]
+    game_num = user_info["game_num"]
+    
     # Create a list of the scores on the leaderboard
     for n in range(1, len(leader),3):
         leader_scores.append(leader[n])
@@ -218,48 +154,58 @@ def add_to_leader_board(name, score, game_num, leader):
     # Leader board empty
     # Add user to leaderboard
     if len_leader < 3:
+        made_leader = True
         leader.append(name)
         leader.append(score)
         leader.append(game_num)
-        made_leader = True
+        
     # Leaderboard not full    
     elif len_leader <  15:
-        # Score not greater than other scores
+        made_leader = True
+        # Score less than scores on leaderboard
         # Add user to end of leaderboard
         if score < int(min(leader_scores)):
             leader.append(name)
             leader.append(score)
             leader.append(game_num)
-            made_leader = True
-        # Score greater than score on leaderboard
+            
+        # Score greater than scores on leaderboard
         # Working from highest to lowest, insert player into highest rank
         else:
-            for n in range(len_leader-2, 0, -3):
+            for n in range(1, len_leader-1, 3):
                 if score >= int(leader[n]):
-                    print(n)
-                    leader.insert(n+2, game_num)
-                    leader.insert(n+2, score)
-                    leader.insert(n+2, name)
-                    made_leader = True
+                    
+                    leader.insert(n-1, game_num)
+                    leader.insert(n-1, score)
+                    leader.insert(n-1, name)
+
                     break
             
     # Leaderboard full, but final score made it onto leaderboard
     # Working from highest to lowest, insert player into highest rank
     elif score >= min(leader_scores):
-        del leader[0:3]
+        made_leader = True
+        del leader[len_leader-3:len_leader]
         len_leader=len(leader)
-        for n in range(len_leader-2, 0, -3):
-            if score >= int(leader[n]):
-                
-                leader.insert(n+2,game_num)
-                leader.insert(n+2, score)
-                leader.insert(n+2, name)
-                made_leader = True
-                break
+        # Score is equal to the lowest score on leaderboard
+        if score == min(leader_scores):
+                leader.append(name)
+                leader.append(score)
+                leader.append(game_num)
+        # Score between scores on leaderboard
+        else:
+            for n in range(1, len_leader, 3):
+                if score >= int(leader[n]):
+                    
+                    leader.insert(n-1, game_num)
+                    leader.insert(n-1, score)
+                    leader.insert(n-1, name)
     
+                    break
+
     return made_leader, leader
     
-def evaluate_result(final_score,user_info):
+def evaluate_result(final_score, user_info):
     
     # Read in leaderboard
     with open("data/leader_board.json", "r") as json_leader_board:
@@ -271,12 +217,12 @@ def evaluate_result(final_score,user_info):
     # First game, full marks
     elif user_info["game_num"] == 0 and final_score == 100:
         user_info["high_score"] = final_score
-        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        made_leader, leader = add_to_leaderboard(user_info, leader)
         result_msg = "Congradulations! You got top marks on your first game. You are on the leaderboard"
     # First game, scored between 0 and 100
     elif user_info["game_num"] == 0 and final_score < 100:
         user_info["high_score"] = final_score
-        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        made_leader, leader = add_to_leaderboard(user_info, leader)
         # Score made it onto leaderboard
         if made_leader:
             result_msg = "Excelent! First game and you made it on the leaderboard."
@@ -286,7 +232,7 @@ def evaluate_result(final_score,user_info):
     # Played before, personnel best
     elif final_score > user_info["high_score"]:
         user_info["high_score"] = final_score
-        made_leader, leader = add_to_leader_board(user_info["name"], final_score, user_info["game_num"], leader)
+        made_leader, leader = add_to_leaderboard(user_info, leader)
         # Score made it onto leaderboard
         if made_leader:
             result_msg = "Excelent! That is a personnel best and you made it to leaderboard"
@@ -418,7 +364,7 @@ def leader():
         leader = json.load(json_leader_board)
     return render_template("leader.html", leader=leader, page_title="Leaderboard")
     
-    
+# Main will only run wen boogle is exicuted from command line not if imported to nother program i.e. get_dictionary    
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=int(os.environ.get('PORT')),
