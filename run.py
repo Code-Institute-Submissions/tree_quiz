@@ -24,6 +24,7 @@ def get_cur_player_data(username, all_players_data):
         all_players_data.append(cur_player_data)
     
     return cur_player_data, all_players_data
+    
 # little point in testing
 def get_all_player_data():
     """
@@ -40,6 +41,23 @@ def dump_all_player_data (all_players_data):
     """
     with open("data/players.json", "w") as json_player_data:           
         json.dump(all_players_data, json_player_data)
+        
+# little point in testing
+def get_leader_data():
+    """
+    Gets player all player data players.json
+    """
+    with open("data/leaderboard.json", "r") as json_leader_data:
+            leader_data = json.load(json_leader_data)
+    return leader_data
+
+# little point in testing   
+def dump_leader_data (leader): 
+    """
+    Dumps the player data back into leaderboard.json
+    """
+    with open("data/leaderboard.json", "w") as json_leader_data:           
+        json.dump(leader_data, json_leader_data)
         
 # tested
 def get_q_data(index):
@@ -81,7 +99,8 @@ def add_to_score(cur_player_data):
     else:
        cur_player_data["cur_score"] += 5 
     return cur_player_data
-       
+
+# HOW to test if return is rendering a website    
 def prep_next_q(start, correct, message, cur_player_data):
     """
     Prepares the first/ next question. Pulls in data from tree_lib.json
@@ -192,17 +211,17 @@ def add_to_leaderboard(cur_player_data, leader):
 
     return made_leader, leader
     
-def evaluate_result(score, cur_player_data, leader):
-    
+def evaluate_result(cur_player_data, leader):
+    score = cur_player_data["cur_score"]
     # Scored 0   
     if score ==0:
         leader = leader
-        result_msg = "You can do better than 0. Try again. Takes a few goes to get them right."
+        result_msg = "You can do better than 0. You should try again, I'm sure you have learned from your mistakes."
     # First game, full marks
     elif cur_player_data["game_num"] == 0 and score == 100:
         cur_player_data["high_score"] = score
         made_leader, leader = add_to_leaderboard(cur_player_data, leader)
-        result_msg = "Congradulations! You got top marks on your first game. You are on the leaderboard"
+        result_msg = "Congradulations! You got top marks on your first game. Check out the leaderboard."
     # First game, scored between 0 and 100
     elif cur_player_data["game_num"] == 0 and score < 100:
         cur_player_data["high_score"] = score
@@ -219,7 +238,7 @@ def evaluate_result(score, cur_player_data, leader):
         made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         # Score made it onto leaderboard
         if made_leader:
-            result_msg = "Excelent! That is a personnel best and you made it to leaderboard"
+            result_msg = "Excelent! You made it onto the leaderboard with this new personnel best."
         # Score did not make it onto leaderboard
         else:
             result_msg = "You are improving. Keep trying to get top marks."
@@ -321,15 +340,14 @@ def submit():
                 + " was the correct answer. That was the final question.")
                
                # Read in leaderboard
-               with open("data/leader_board.json", "r") as json_leader_board:
-                   leader = json.load(json_leader_board) 
+
+               leader = get_leader_data()
                    
                # Compare final score to users past high scores and the leaderboard
-               result_msg, cur_player_data, leader = evaluate_result(score, cur_player_data, leader)
+               result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
                
                # Write to leaderboard
-               with open("data/leader_board.json", "w") as json_leader_board:           
-                   json.dump(leader, json_leader_board)
+               dump_leader_data(leader)
                
                # reset game
                reset_game(cur_player_data)
@@ -349,15 +367,13 @@ def submit():
                     + tree_name + ". That was the final qustion.")
                 
                 # Read in leaderboard
-                with open("data/leader_board.json", "r") as json_leader_board:
-                    leader = json.load(json_leader_board)
+                leader = get_leader_data()
                 
                 # Compare final score to users past high scores and the leaderboard    
-                result_msg, cur_player_data, leader = evaluate_result(score, cur_player_data, leader)
+                result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
                 
                 # Write to leaderboard
-                with open("data/leader_board.json", "w") as json_leader_board:           
-                    json.dump(leader, json_leader_board)
+                dump_leader_data()
              
                 # reset game
                 reset_game(cur_player_data)
