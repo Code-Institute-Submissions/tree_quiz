@@ -6,6 +6,32 @@ import json
 from flask import Flask, render_template, request, flash
 
 class TestQuiz(unittest.TestCase):
+    def test_get_q_data(self):
+        """
+        Test test_get_q_data(index). Gets the tree name and url of tree image
+        for the next question
+        """
+        # Check if funciton gets the correct q data
+        self.assertEquals(("arbutus", "/static/img/arbutus.jpg"), run.get_q_data(1))
+        self.assertEquals(("holly", "/static/img/holly.jpg"), run.get_q_data(6))
+        
+    def test_check_answer(self):
+        "Test check_answer(index, answer), returns True or False"
+        # Check for all right answers
+        self.assertTrue(run.check_answer(1,"arbutus"))
+        self.assertTrue(run.check_answer(2,"ash"))
+        self.assertTrue(run.check_answer(3,"birch"))
+        self.assertTrue(run.check_answer(4,"hawthorn"))
+        self.assertTrue(run.check_answer(5,"hazel"))
+        self.assertTrue(run.check_answer(6,"holly"))
+        self.assertTrue(run.check_answer(7,"oak"))
+        self.assertTrue(run.check_answer(8,"pine"))
+        self.assertTrue(run.check_answer(9,"willow"))
+        self.assertTrue(run.check_answer(10,"yew"))
+        # Check for wrong answer
+        self.assertFalse(run.check_answer(2,"arbutus"))
+        # Check accepts captialized
+        self.assertTrue(run.check_answer(1,"ArbuTus"))
     
     def test_add_to_leaderboard(self):
         """
@@ -68,15 +94,3 @@ class TestQuiz(unittest.TestCase):
         self.assertFalse(made_leader)
         
 
-
-        
-
-
-
-            
-    
-    # Working from highest to lowest, insert player into highest rank
-
-    
-        
-        

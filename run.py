@@ -12,7 +12,7 @@ def access_user_data(username):
     Requires player.json file to contain list, either empty or occupied.
     """
     global all_players_data
-    global cur_player_data
+    global glob_cur_player_data
     
     username = username.lower()
     past_player = False
@@ -31,7 +31,9 @@ def access_user_data(username):
                 "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
             all_players_data.append(cur_player_data)
     
+    glob_cur_player_data = cur_player_data
     dump_all_player_data ()
+    return cur_player_data
     
 def dump_all_player_data (): 
     """
@@ -39,25 +41,10 @@ def dump_all_player_data ():
     """
     with open("data/players.json", "w") as json_player_data:           
         json.dump(all_players_data, json_player_data)
-        
-def get_img(index):
+
+def get_q_data(index):
     """
-    Get the image address for the current question
-    """
-    with open("data/tree_lib.json", "r") as json_quiz_data:
-        quiz_data = json.load(json_quiz_data)
-        
-
-        for obj in quiz_data:
-            if obj["index"] == index:  
-
-                tree_image = obj["tree_image"]
-
-    return tree_image
-
-def get_name(index):
-    """
-    Get the answer for the current question
+    Get the tree name and image address for the current question
     """
     with open("data/tree_lib.json", "r") as json_quiz_data:
         quiz_data = json.load(json_quiz_data)
@@ -65,16 +52,24 @@ def get_name(index):
 
         for obj in quiz_data:
             if obj["index"] == index:  
-
+                
                 tree_name = obj["tree_name"]
-
-    return tree_name
+                tree_image = obj["tree_image"]
+                
+        return tree_name, tree_image
     
 def check_answer(index, answer):
     """
-    Checks if the answer submited is correct
+    Checks if the answer submited is correct. Returns True or False
     """
     answer = answer.lower()
+    tree_name, tree_image = get_q_data(index)
+    if answer == tree_name:
+        return True
+    else:
+        return False
+    
+    """    
     with open("data/tree_lib.json", "r") as json_quiz_data:
         quiz_data = json.load(json_quiz_data)
         
@@ -84,8 +79,9 @@ def check_answer(index, answer):
                 return True
             elif obj["index"] == index and obj["tree_name"] != answer:
                 return False
+    """
         
-def add_to_score():
+def add_to_score(cur_player_data):
     """
     Increases the current score by 10 if correct on attempt 1
     Increases the current score by 5 if correct on attemp 2
@@ -94,9 +90,9 @@ def add_to_score():
        cur_player_data["cur_score"] += 10
     else:
        cur_player_data["cur_score"] += 5 
-    return cur_player_data["cur_score"]
+    return cur_player_data
        
-def prep_next_q(start, correct, message):
+def prep_next_q(start, correct, message, cur_player_data):
     """
     Prepares the first/ next question. Pulls in data from tree_lib.json
     based on information from players.json
@@ -114,8 +110,7 @@ def prep_next_q(start, correct, message):
        
     cur_question = cur_player_data["cur_question"]
     max_score = (cur_player_data["cur_question"] - 1)*10
-    tree_name = get_name(cur_question)
-    tree_image = get_img(cur_question)
+    tree_name, tree_image = get_q_data(cur_question)
     cur_score=cur_player_data["cur_score"]
     attempt=cur_player_data["attempt"]
     dump_all_player_data ()
@@ -123,7 +118,7 @@ def prep_next_q(start, correct, message):
         tree_name=tree_name, message=message, cur_score=cur_score, 
         attempt=attempt, cur_question=cur_question, max_score=max_score)
        
-def reset_game():
+def reset_game(cur_player_data):
     """
     Resets the the user game data after final question, 
     Current question set to 1 once game begins
@@ -132,9 +127,10 @@ def reset_game():
     cur_player_data["attempt"] = 1
     cur_player_data["cur_question"] = 0
     cur_player_data["game_num"] += 1
+    glob_cur_player_data = cur_player_data
     dump_all_player_data ()
 
-def add_to_leaderboard(user_info, leader):
+def add_to_leaderboard(cur_player_data, leader):
     """
     The leader board will show the top 5 players. This function fills the the 
     top 5 slots and saves them in leader_board.json. 
@@ -143,9 +139,9 @@ def add_to_leaderboard(user_info, leader):
     len_leader = len(leader)
     leader_scores=[]
     
-    name = user_info["name"]
-    score = user_info["high_score"]
-    game_num = user_info["game_num"]
+    name = cur_player_data["name"]
+    score = cur_player_data["high_score"]
+    game_num = cur_player_data["game_num"]
     
     # Create a list of the scores on the leaderboard
     for n in range(1, len(leader),3):
@@ -205,24 +201,21 @@ def add_to_leaderboard(user_info, leader):
 
     return made_leader, leader
     
-def evaluate_result(final_score, user_info):
+def evaluate_result(score, cur_player_data, leader):
     
-    # Read in leaderboard
-    with open("data/leader_board.json", "r") as json_leader_board:
-        leader = json.load(json_leader_board)
     # Scored 0   
-    if final_score ==0:
+    if score ==0:
         leader = leader
         result_msg = "You can do better than 0. Try again. Takes a few goes to get them right."
     # First game, full marks
-    elif user_info["game_num"] == 0 and final_score == 100:
-        user_info["high_score"] = final_score
-        made_leader, leader = add_to_leaderboard(user_info, leader)
+    elif cur_player_data["game_num"] == 0 and score == 100:
+        cur_player_data["high_score"] = score
+        made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         result_msg = "Congradulations! You got top marks on your first game. You are on the leaderboard"
     # First game, scored between 0 and 100
-    elif user_info["game_num"] == 0 and final_score < 100:
-        user_info["high_score"] = final_score
-        made_leader, leader = add_to_leaderboard(user_info, leader)
+    elif cur_player_data["game_num"] == 0 and score < 100:
+        cur_player_data["high_score"] = score
+        made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         # Score made it onto leaderboard
         if made_leader:
             result_msg = "Excelent! First game and you made it on the leaderboard."
@@ -230,9 +223,9 @@ def evaluate_result(final_score, user_info):
         else:
             result_msg = "Good first try. Have another game and try to make it onto leaderboard."
     # Played before, personnel best
-    elif final_score > user_info["high_score"]:
-        user_info["high_score"] = final_score
-        made_leader, leader = add_to_leaderboard(user_info, leader)
+    elif score > cur_player_data["high_score"]:
+        cur_player_data["high_score"] = score
+        made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         # Score made it onto leaderboard
         if made_leader:
             result_msg = "Excelent! That is a personnel best and you made it to leaderboard"
@@ -242,11 +235,9 @@ def evaluate_result(final_score, user_info):
     else:
         # Scored less than personnel high score
         leader = leader
-        result_msg = "Good job, but you didn't beat your own top score of " + str(user_info["high_score"])
+        result_msg = "Good job, but you didn't beat your own top score of " + str(cur_player_data["high_score"])
     
-    with open("data/leader_board.json", "w") as json_leader_board:           
-        json.dump(leader, json_leader_board)
-    return result_msg, leader
+    return result_msg, cur_player_data, leader
     
 @app.route('/')
 def index():
@@ -267,7 +258,7 @@ def start():
         
         # If new user creates info space
         # If returning user access info
-        access_user_data(username)
+        cur_player_data = access_user_data(username)
         # Assign appropriete welcome message
         
         if cur_player_data["cur_question"] != 0:
@@ -278,7 +269,7 @@ def start():
                 + ". Looks like you've played this game before. Best of luck this time around.")
         else:
             message = "Hello " + username + " do you know the name of this tree?"
-        return prep_next_q(True, True, message)
+        return prep_next_q(True, True, message, glob_cur_player_data)
         
     else:    
         return render_template("index.html")   
@@ -291,6 +282,7 @@ def submit():
     If correct moves onto next question
     If wrong allows second attempt before moving onto next question
     """
+    cur_player_data = glob_cur_player_data
     cur_question = cur_player_data["cur_question"]
     answer = request.form["answer"]
     if request.method == "POST":
@@ -299,60 +291,77 @@ def submit():
             # If correct answer move on to next question
             if check_answer(cur_question, answer) == True:
                 # Increase current score approprietly 
-                add_to_score()
+                cur_player_data = add_to_score(cur_player_data)
                 # Set up the next question     
                 message = ("Good job! " + answer.title() 
                     + " was the correct answer. How about this one?")    
-                return prep_next_q(False, True, message)
+                return prep_next_q(False, True, message, cur_player_data)
                 
             # If wrong on first attempt, give second attempt
             elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
                 message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
-                return prep_next_q(False, False, message)
+                return prep_next_q(False, False, message, cur_player_data)
             # If wrong on second attempt, move onto next question
             else:
-                tree_name = get_name(cur_question)
+                tree_name, tree_image = get_q_data(cur_question)
                 message = (answer.title()  + " was not correct. The correct answer was " 
                     + tree_name + ". Might have better look with this one?")
-                return prep_next_q(False, False, message)
+                return prep_next_q(False, False, message, cur_player_data)
         
         # For the final question
         else:
            # If correct reset game, show Game Over page with appropriete message
            if check_answer(cur_question, answer) == True:
                # Increase current score approprietly 
-               add_to_score()
-               final_score = cur_player_data["cur_score"]
-               final_score_str = str(cur_player_data["cur_score"])
+               cur_player_data = add_to_score(cur_player_data)
+               score = cur_player_data["cur_score"]
+               score_str = str(cur_player_data["cur_score"])
                message = ("Good job! " + answer.title() 
                 + " was the correct answer. That was the final question.")
-               result_msg, leader = evaluate_result(final_score, cur_player_data)
+               
+               # Read in leaderboard
+               with open("data/leader_board.json", "r") as json_leader_board:
+                   leader = json.load(json_leader_board) 
+                   
+               # Compare final score to users past high scores and the leaderboard
+               result_msg, cur_player_data, leader = evaluate_result(score, cur_player_data, leader)
+               
+               # Write to leaderboard
+               with open("data/leader_board.json", "w") as json_leader_board:           
+                   json.dump(leader, json_leader_board)
                
                # reset game
-               reset_game()
-               with open("data/leader_board.json", "r") as json_leader_board:
-                    leader = json.load(json_leader_board)
-               return render_template("game_over.html", message=message, final_score_str=final_score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
+               reset_game(cur_player_data)
+
+               return render_template("game_over.html", message=message, score_str=score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
                
            # If wrong on first attempt, give second attempt
            elif check_answer(cur_question, answer) == False and cur_player_data["attempt"] == 1:
                 message = "Ooops! " + answer.title()  + " was not correct. How about another guess?"
-                return prep_next_q(False, False, message)
+                return prep_next_q(False, False, message, cur_player_data)
            # If wrong on second attempt, reset game, show Game Over page with appropriete message 
            else:
-                final_score = cur_player_data["cur_score"]
-                final_score_str = str(cur_player_data["cur_score"])
-                tree_name = get_name(cur_question)
+                score = cur_player_data["cur_score"]
+                score_str = str(cur_player_data["cur_score"])
+                tree_name, tree_image = get_q_data(cur_question)
                 message = (answer.title()  + " was not correct. The correct answer was " 
                     + tree_name + ". That was the final qustion.")
                 
-                result_msg, leader = evaluate_result(final_score, cur_player_data)
-             
-                # reset game
-                reset_game()
+                # Read in leaderboard
                 with open("data/leader_board.json", "r") as json_leader_board:
                     leader = json.load(json_leader_board)
-                return render_template("game_over.html", message=message,  final_score_str=final_score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
+                
+                # Compare final score to users past high scores and the leaderboard    
+                result_msg, cur_player_data, leader = evaluate_result(score, cur_player_data, leader)
+                
+                # Write to leaderboard
+                with open("data/leader_board.json", "w") as json_leader_board:           
+                    json.dump(leader, json_leader_board)
+             
+                # reset game
+                reset_game(cur_player_data)
+                
+                return render_template("game_over.html", message=message,  score_str=score_str, result_msg=result_msg, leader=leader, page_title="Game_Over")
 
     
 @app.route('/leader', methods=['GET', 'POST'])
