@@ -23,13 +23,29 @@
             
             <div class="col-sm-6 q_container"> 
                 <p class="message">{{ message }}</p>
-                <div class="submit_container">
-                    <form method="POST" action="/submit/">
-                        <label for="answer">Answer:</label>
-                        <input type="text" id="answer" name="answer">
-                    <button class="btn">Submit Answer!</button>
-                    </form>
-                </div>
+                {% if hide_next_btn %}
+                    <div class="submit_container">
+                        <form method="POST" action="/submit/">
+                            <label for="answer">Answer:</label>
+                            <input type="text" id="answer" name="answer">
+                        <button class="btn">Submit Answer!</button>
+                        </form>
+                    </div>
+                {% else %}
+                    
+                    <div class="next_btn_container">
+                        {% if cur_question < 10 %}
+                            <form method="POST" action="/next_q/">
+                            <button class="btn">Next Question!</button>
+                            </form>
+                        {% else %}
+                            <form method="POST" action="/finsh_game/">
+                            <button class="btn">Finish Game</button>
+                            </form>
+                        {% endif %}    
+                    </div>
+                    
+                {% endif %}
             </div>
         </div>
     </div>

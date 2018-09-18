@@ -7,16 +7,21 @@
         <p>If you have already played, just enter the same username to continue where you left off</p>
     </div>
     <div class="sign-in">
-        <form method="POST" action="/start/">
+        <form method="POST" action="/check_name/">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username">
-            <button class="btn">Join the Game!</button>
+            <button class="btn">Sign in</button>
         </form>
     </div>
-    <div class="extra-info">
-        <p>Hi (user,), looks like this is your first game. This game consists of 10 images of trees native of Ireland. 
-        Just type the name of the tree into the answer box.You will get two attempts per images. 10 points if you get 
-        it right on the first go, 5 points if you get it on the second.Ready?</p>
+    <div class="wel_msg">
+        <p>{{ welcome_msg }}</p>
+    </div>
+    <div class="start-btn">
+        {% if hide_start_btn == False %}
+        <form method="POST" action="/next_q/">
+            <button class="btn">Start the Game!</button>
+        </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

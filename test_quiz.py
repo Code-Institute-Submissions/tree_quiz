@@ -18,7 +18,7 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
         all_player_data_new = [{"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
-        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
+        self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
         
         # Check: 2 players, user new played
         all_player_data_old = [{"name": "name1","game_num": 0, 
@@ -30,7 +30,7 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
-        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name3", all_player_data_old))
+        self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name3", all_player_data_old))
         # Check: 3 players, user has played before
         all_player_data_old = [{"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
@@ -39,7 +39,7 @@ class TestQuiz(unittest.TestCase):
         cur_player_data = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
         all_player_data_new = all_player_data_old
-        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
+        self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
         # Check: Username not case sensitive
         all_player_data_old = [{"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
@@ -48,7 +48,7 @@ class TestQuiz(unittest.TestCase):
         cur_player_data = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
         all_player_data_new = all_player_data_old
-        self.assertEquals((cur_player_data, all_player_data_new), run.get_cur_player_data("NamE1", all_player_data_old))
+        self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("NamE1", all_player_data_old))
         
     def test_get_q_data(self):
         """
@@ -56,8 +56,8 @@ class TestQuiz(unittest.TestCase):
         for the next question
         """
         # Check if funciton gets the correct q data
-        self.assertEquals(("arbutus", "/static/img/arbutus.jpg"), run.get_q_data(1))
-        self.assertEquals(("holly", "/static/img/holly.jpg"), run.get_q_data(6))
+        self.assertEqual(("arbutus", "/static/img/arbutus.jpg"), run.get_q_data(1))
+        self.assertEqual(("holly", "/static/img/holly.jpg"), run.get_q_data(6))
         
     def test_check_answer(self):
         "Test check_answer(index, answer), returns True or False"
@@ -86,12 +86,12 @@ class TestQuiz(unittest.TestCase):
         cur_player_data = {"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
         new_cur_player_data = run.add_to_score(cur_player_data)
-        self.assertEquals(new_cur_player_data["cur_score"], 10)
+        self.assertEqual(new_cur_player_data["cur_score"], 10)
         # Check current score incrented by 5 if attempt > 1
         cur_player_data = {"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 2, "cur_score": 10, "high_score": 0}
         new_cur_player_data = run.add_to_score(cur_player_data)
-        self.assertEquals(new_cur_player_data["cur_score"], 15)
+        self.assertEqual(new_cur_player_data["cur_score"], 15)
         
     def test_add_to_leaderboard(self):
         """
