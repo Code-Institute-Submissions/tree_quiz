@@ -44,6 +44,9 @@ def dump_all_players_data (all_players_data):
         json.dump(all_players_data, json_player_data)
 
 def update_players_json(cur_player_data):
+    """
+    Updates players.json file with cur_player_data
+    """
     all_players_data = get_all_players_data()
     print(all_players_data)
     print(cur_player_data)
@@ -79,18 +82,18 @@ def get_welcome_msg(cur_player_data):
     if cur_player_data["cur_question"] != 0:
         welcome_msg = ("Welcome back " + cur_player_data["name"]
             + ". Looks like you left us mid game. You are currently on question " 
-            + str(cur_player_data["cur_question"]) 
-            + ". Click play or enter a different username.")
+            + str(cur_player_data["cur_question"]) + ".")
+            
         cur_player_data["cur_question"] -= 1
         hide_start_btn = False
     elif cur_player_data["game_num"] != 1:
         welcome_msg = ("Welcome back " + cur_player_data["name"] 
-            + ". You have played this game " + 
-            str(cur_player_data["game_num"]) 
-            + " times before. Click play or enter a different username.")
+            + ". You have played this game " 
+            + str(cur_player_data["game_num"]) 
+            + " times before.")
         hide_start_btn = False
     else:
-        welcome_msg = "Hello " + cur_player_data["name"] + ". Looks like this is your first game. Best of luck!"
+        welcome_msg = "Welcome " + cur_player_data["name"] + ". This looks like your first game."
         hide_start_btn = False
         
     return welcome_msg, hide_start_btn, cur_player_data
@@ -104,7 +107,7 @@ def get_q_data(index):
     with open("data/tree_lib.json", "r") as json_quiz_data:
         quiz_data = json.load(json_quiz_data)
         
-        max_score = (index - 1)*10
+        max_score = (index)*10
         for obj in quiz_data:
             if obj["index"] == index:  
                 tree_name = obj["tree_name"]
@@ -275,9 +278,7 @@ def index():
     """
     Home page
     """
-    # should make test for this
-    welcome_msg = "Welcome, please enter username."
-    return render_template("index.html", welcome_msg=welcome_msg, 
+    return render_template("index.html", welcome_msg="", 
                                          hide_start_btn = True)
 
 @app.route('/check_name/', methods=['GET', 'POST'])
@@ -298,9 +299,7 @@ def check_name():
             all_players_data = get_all_players_data()
             cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
             welcome_msg, hide_start_btn, cur_player_data = get_welcome_msg(cur_player_data)
-            
-        glob_cur_player_data = cur_player_data
-        # glob_all_players_data = get_all_players_data()
+            glob_cur_player_data = cur_player_data
 
         return render_template("index.html", welcome_msg=welcome_msg, 
                                              hide_start_btn = hide_start_btn)
@@ -329,18 +328,22 @@ def submit():
     cur_player_data = glob_cur_player_data
     answer = request.form["answer"]
     if request.method == "POST":
-        correct, tree_name = check_answer(cur_player_data["cur_question"], answer)
-        if correct:
-            cur_player_data = add_to_score(cur_player_data)
-            feedback_msg = "Good job! This is a " + tree_name + " tree."
-            hide_next_btn = False
-        elif not correct and cur_player_data["attempt"] < 2:
-            feedback_msg = answer.title() + " is not correct, but you still have a second try."
+        if answer == "":
+            feedback_msg = "You can not submit a blank entry!"
             hide_next_btn = True
-            cur_player_data["attempt"] += 1
-        else:
-            feedback_msg = answer.title() + " is not correct. This is a " + tree_name
-            hide_next_btn = False
+        else:    
+            correct, tree_name = check_answer(cur_player_data["cur_question"], answer)
+            if correct:
+                cur_player_data = add_to_score(cur_player_data)
+                feedback_msg = "Good job! This is a " + tree_name + " tree."
+                hide_next_btn = False
+            elif not correct and cur_player_data["attempt"] < 2:
+                feedback_msg = answer.title() + " is not correct, but you still have a second try."
+                hide_next_btn = True
+                cur_player_data["attempt"] += 1
+            else:
+                feedback_msg = answer.title() + " is not correct. This is a " + tree_name
+                hide_next_btn = False
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
         glob_cur_player_data = cur_player_data
         update_players_json(cur_player_data)
@@ -363,15 +366,12 @@ def finsh_game():
     
     # Read in leaderboard
     leader = get_leader_data()
-       
     # Compare final score to users past high scores and the leaderboard
     result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
-   
     # Write to leaderboard
     dump_leader_data(leader)
-   
-    # reset game
-    score_str = str(cur_player_data["cur_score"])
+    score_str=str(cur_player_data["cur_score"])
+    # Reset game
     reset_game(cur_player_data)
 
     return render_template("game_over.html", score_str=score_str, 
@@ -384,11 +384,16 @@ def leader():
     """
     Redirects to leader_board
     """
-    with open("data/leader_board.json", "r") as json_leader_board:
+    with open("data/leaderboard.json", "r") as json_leader_board:
         leader = json.load(json_leader_board)
     return render_template("leader.html", leader=leader, 
                                           page_title="Leaderboard")
-    
+
+@app.route('/instructions/')
+def instructions(): 
+    return render_template("instructions.html", page_title="Instructions") 
+                                          
+   
 # Main will only run wen run is exicuted from command line not if imported to nother program i.e. get_dictionary    
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),

@@ -1,15 +1,17 @@
 {% extends 'base.html' %} 
 {% block content %}
-<div class="col-md-8 col-md-offset-2 index_content">
+<div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 index_content">
     <div class="pre-info">
         <h2>Tree Quiz</h2>
         <h3>Do you know your Irish tree's? <br> Sign in and take the quiz!</h3>
-        <p>If you have already played, just enter the same username to continue where you left off</p>
+
+        <p>If you have already played, just enter the same username to continue where you left off!</p>
+        <p>For game instructions please click <a href="{{ url_for('instructions') }}">here.</a></p>
+
     </div>
     <div class="sign-in">
         <form method="POST" action="/check_name/">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" placeholder=" Enter Username">
             <button class="btn">Sign in</button>
         </form>
     </div>
@@ -18,8 +20,9 @@
     </div>
     <div class="start-btn">
         {% if hide_start_btn == False %}
+        <p class="start-game-msg">Click Play Game or enter a different username!</p>
         <form method="POST" action="/next_q/">
-            <button class="btn">Start the Game!</button>
+            <button class="btn">Play Game!</button>
         </form>
         {% endif %}
     </div>
