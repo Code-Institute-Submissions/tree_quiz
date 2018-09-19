@@ -15,8 +15,10 @@
               <li>Your score will only be added to the leaderboard if its your new personnel best.</li>
             </ul>
         </div>
-        <div class="home-btn">
-            <button class="btn"><a href="{{ url_for('index') }}">Sign In to Play!</button>
-        </div>
+        <div>
+            <form action="{{ url_for('index') }}">
+                <button class="btn home-btn">Sign In to Play!</button>
+            </form>
+        </div>    
 </div>
 {% endblock %}

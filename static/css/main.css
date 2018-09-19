@@ -156,15 +156,21 @@
     border-color: #c68c53;
 }
 /* ------------------------------------------------------Game Over Styleing*/
+.leaderboard-table-game-over{
+    margin-bottom: 10px;
+    text-align: center;
+}
+.play-again-btn {
+    margin-bottom:30px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+}
 
 /* ------------------------------------------------------Leader Styleing*/
 
 .leader_content {
     text-align: center;
-}
-
-.leaderboard-table{
-    margin-bottom: 30px;
 }
 
 .leader_board_1{
@@ -173,4 +179,12 @@
 
 .table_row{
     text-align: center;
+}
+
+.home-btn {
+    margin-bottom:30px;
+    margin-top:20px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
 }

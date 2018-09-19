@@ -8,44 +8,48 @@
                 <th class="table_row">Rank</th>
                 <th class="table_row">Username</th>
                 <th class="table_row">High Score</th>
-                <th class="table_row">Game No.</th>
+                <th class="table_row hidden-xs">Game No.</th>
             </tr>
             
             <tr>
                 <td class="table_row">1</td>
                 <td class="table_row">{{ leader[0] }}</td>
                 <td class="table_row">{{ leader[1] }}</td>
-                <td class="table_row">{{ leader[2] }}</td>
+                <td class="table_row hidden-xs">{{ leader[2] }}</td>
             </tr>
             <tr>
                 <td class="table_row">2</td>
                 <td class="table_row">{{ leader[3] }}</td>
                 <td class="table_row">{{ leader[4] }}</td>
-                <td class="table_row">{{ leader[5] }}</td>
+                <td class="table_row hidden-xs">{{ leader[5] }}</td>
             </tr>
             <tr>
                 <td class="table_row">3</td>
                 <td class="table_row">{{ leader[6] }}</td>
                 <td class="table_row">{{ leader[7] }}</td>
-                <td class="table_row">{{ leader[8] }}</td>
+                <td class="table_row hidden-xs">{{ leader[8] }}</td>
             </tr>
             <tr>
                 <td class="table_row">4</td>
                 <td class="table_row">{{ leader[9] }}</td>
                 <td class="table_row">{{ leader[10] }}</td>
-                <td class="table_row">{{ leader[11] }}</td>
+                <td class="table_row hidden-xs">{{ leader[11] }}</td>
             </tr>
             <tr>
                 <td class="table_row">5</td>
                 <td class="table_row">{{ leader[12] }}</td>
                 <td class="table_row">{{ leader[13] }}</td>
-                <td class="table_row">{{ leader[14] }}</td>
+                <td class="table_row hidden-xs">{{ leader[14] }}</td>
             </tr>
             
         </tbody>
     </table>
-    <div class="home-btn">
-        <button class="btn"><a href="{{ url_for('index') }}">Sign In to Play!</button>
+    <div>
+        <form action="{{ url_for('index') }}">
+            <button class="btn home-btn">Sign In to Play!</button>
+        </form>
     </div>
 </div>
 {% endblock %}
+
+        
