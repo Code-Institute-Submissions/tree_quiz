@@ -1,11 +1,30 @@
 /* ------------------------------------------------------Base Styleing*/
-
-.navbar-default .navbar-nav>li>a:hover {
+.navbar-default .navbar-brand {
     color: white;
 }
+.navbar-default .navbar-brand:hover {
+    color: #b35573;
+    background-color: whitesmoke;
+}
 
-.menu-item {
-    color:white;
+.quiz-title{
+    float: left;
+    height: 30px;
+    padding: 15px 15px;
+    font-size: 18px;
+    line-height: 20px;
+    color: white;
+}
+.navbar-default .navbar-nav>li>a {
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    
+}
+
+.navbar-default .navbar-nav>li>a:hover {
+    color: #b35573;
+    background-color: whitesmoke;
 }
 
 .header {
@@ -26,6 +45,20 @@
     vertical-align: middle;
     width:100%;
     opacity: 0.5;
+}
+
+.footer-text{
+    color: white;
+    margin-top: 5px;
+}
+
+.git-link{
+    color: white;
+    font-weight: bold;
+}
+
+.git-link:hover {
+    color: #b35573;
 }
 
 .background {
