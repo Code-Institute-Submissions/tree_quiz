@@ -1,4 +1,10 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} 
+
+{% block head %}
+<title>Tree Quiz | {{ title }}</title>
+{% endblock %}
+
+{% block content %}
 <div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 leader_content">
     <h1>Tree Quiz Leader Board</h1>
     <h2>Did you make the cut?</h2>

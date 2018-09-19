@@ -243,7 +243,8 @@ def index():
     """
     return render_template("index.html", welcome_msg="", 
                                          hide_start_btn = True,
-                                         username="")
+                                         username="",
+                                         title="Sign In")
 
 @app.route('/check_username', methods=['GET', 'POST'])
 def check_username():
@@ -268,7 +269,8 @@ def check_username():
 
         return render_template("index.html", welcome_msg=welcome_msg, 
                                              hide_start_btn=hide_start_btn, 
-                                             username=username)
+                                             username=username,
+                                             title="Welcome")
         
 @app.route('/question/<username>', methods=['GET', 'POST'])
 def question(username):
@@ -283,6 +285,7 @@ def question(username):
     cur_player_data["attempt"] = 1
     tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
     update_players_json(cur_player_data)
+    title = "Question " + str(cur_player_data["cur_question"])
     return render_template("quiz.html", tree_image=tree_image, 
                                     cur_score=cur_player_data["cur_score"], 
                                     attempt=cur_player_data["attempt"], 
@@ -291,7 +294,8 @@ def question(username):
                                     message="What is the name of this tree?",
                                     feedback_msg = "Temp Feedback Msg",
                                     hide_next_btn=True,
-                                    username=username)
+                                    username=username,
+                                    title=title)
     
 @app.route('/submit/<username>', methods=['GET', 'POST'])
 def submit(username):
@@ -313,6 +317,7 @@ def submit(username):
             feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         
         update_players_json(cur_player_data)
+        title = "Q." + str(cur_player_data["cur_question"])
         return render_template("quiz.html", tree_image=tree_image, 
                                             cur_score=cur_player_data["cur_score"], 
                                             attempt=cur_player_data["attempt"], 
@@ -321,7 +326,8 @@ def submit(username):
                                             message=feedback_msg,
                                             feedback_msg = feedback_msg,
                                             hide_next_btn=hide_next_btn,
-                                            username=username)
+                                            username=username,
+                                            title=title)
                                             
 @app.route('/game_over/<username>', methods=['GET', 'POST'])                                            
 def game_over(username):
@@ -348,25 +354,25 @@ def game_over(username):
     return render_template("game_over.html", score_str=score_str, 
                                              result_msg=result_msg, 
                                              leader=leader, 
-                                             page_title="Game_Over",
-                                             username=username)
+                                             username=username,
+                                             title="Game Over",)
     
 @app.route('/leaderboard', methods=['GET', 'POST'])
 def leaderboard(): 
     """
-    Module returns leader.html.
+    Module returns leaderboard.html.
     """
     with open("data/leaderboard.json", "r") as json_leader_board:
         leader = json.load(json_leader_board)
-    return render_template("leader.html", leader=leader, 
-                                          page_title="Leaderboard")
+    return render_template("leaderboard.html", leader=leader, 
+                                          title="Leaderboard")
 
 @app.route('/instructions/')
 def instructions(): 
     """
     Module returns instructions.html.
     """    
-    return render_template("instructions.html", page_title="Instructions") 
+    return render_template("instructions.html", title="Instructions") 
                                           
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
