@@ -95,33 +95,66 @@
     margin-top: 30px;
     margin-bottom: 30px;
 }
+.name-input{
+    margin:5px;
+}
+.sign-in-btn{
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+    margin:5px;
+}
+
+.start-btn-container{
+    margin-bottom: 30px
+}
 .start-btn{
-    margin-bottom: 50px
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
 }
 
 /* ------------------------------------------------------Quiz Styleing*/
-.tree_img_container {
-    height: 320px;
+.all-question_content{
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
-
 .tree_img {
-    size: contain;
+    width: 100%;
+    height: auto;
 }
 
+.question_num {
+    text-align: left;
+}
 .attempt_num {
     text-align: center
 }
 .cur_score {
     text-align: right;
 }
-.question_content {
-    margin: 30px;
-}
 
 .message{
-    margin: 30px;
+    margin-top: 30px;
 }
 
+.answer-intput{
+    margin:5px;
+
+}
+.submit-btn{
+    margin:5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+}
+
+.next-btn{
+    margin:5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+}
 /* ------------------------------------------------------Game Over Styleing*/
 
 /* ------------------------------------------------------Leader Styleing*/

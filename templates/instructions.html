@@ -1,0 +1,22 @@
+{% extends 'base.html' %} 
+{% block content %}
+<div class="col-xs-10 col-xs-offset-1 col-sm-8 col-sm-offset-2 index_content">
+        <h2>How to Play</h2>
+        <div class="row">
+            <ul class="col-xs-10 col-xs-offset-1 how-to-play">
+              <li>You will be presented with 10 pictures of common Irish trees.</li>
+              <li>You will get two attempts to enter the name of the tree.</li>
+              <li>10 points for correct answer on first attempt.</li>
+              <li>5 points for correct answer on first attempt.</li>
+              <li>Your game play is saved, linked to your username. So choose a unique name?</li>
+              <li>You can exit the game at any stage by clicking the Home or Leaderboard menu options, or by closing the tab.</li>
+              <li>You can take up where you left off at any stage by simply signing in with your username.</li>
+              <li>Play as many times as you like and try to make it onto the top 5 leaderboard.</li>
+              <li>Your score will only be added to the leaderboard if its your new personnel best.</li>
+            </ul>
+        </div>
+        <div class="home-btn">
+            <button class="btn"><a href="{{ url_for('index') }}">Sign In to Play!</button>
+        </div>
+</div>
+{% endblock %}

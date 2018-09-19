@@ -11,18 +11,18 @@
     </div>
     <div class="sign-in">
         <form method="POST" action="/check_name/">
-            <input type="text" id="username" name="username" placeholder=" Enter Username">
-            <button class="btn">Sign in</button>
+            <input class="name-input" type="text" id="username" name="username" placeholder=" Enter Username">
+            <button class="btn sign-in-btn">Sign in</button>
         </form>
     </div>
     <div class="wel_msg">
         <p>{{ welcome_msg }}</p>
     </div>
-    <div class="start-btn">
+    <div class="start-btn-container">
         {% if hide_start_btn == False %}
         <p class="start-game-msg">Click Play Game or enter a different username!</p>
         <form method="POST" action="/next_q/">
-            <button class="btn">Play Game!</button>
+            <button class="btn start-btn">Play Game!</button>
         </form>
         {% endif %}
     </div>
