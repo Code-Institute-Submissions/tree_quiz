@@ -242,16 +242,17 @@ def index():
     Home page
     """
     return render_template("index.html", welcome_msg="", 
-                                         hide_start_btn = True)
+                                         hide_start_btn = True,
+                                         username="")
 
-@app.route('/check_name/', methods=['GET', 'POST'])
-def check_name():
+@app.route('/check_username', methods=['GET', 'POST'])
+def check_username():
     """
     Module accepts POST of username from index.html and return index.html 
     displaying appropriete welcome message and the next question button when
     required.
     """
-    global glob_cur_player_data
+
     username = request.form["username"]
     if request.method == "POST":
         
@@ -261,26 +262,26 @@ def check_name():
         else:
             all_players_data = read_json_data("data/players.json")
             cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-            write_json_data(all_players_data, "data/players.json")
             welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
-            glob_cur_player_data = cur_player_data
+            update_players_json(cur_player_data)
             hide_start_btn = False
 
         return render_template("index.html", welcome_msg=welcome_msg, 
-                                             hide_start_btn = hide_start_btn)
+                                             hide_start_btn=hide_start_btn, 
+                                             username=username)
         
-@app.route('/next_q/', methods=['GET', 'POST'])
-def next_question():
+@app.route('/question/<username>', methods=['GET', 'POST'])
+def question(username):
     """
     Module returns quiz.html with the next question in the quiz, based on
     cur_player_data.
     """
-    global glob_cur_player_data
-    cur_player_data = glob_cur_player_data
+
+    all_players_data = read_json_data("data/players.json")
+    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
     cur_player_data["cur_question"] += 1
     cur_player_data["attempt"] = 1
     tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
-    glob_cur_player_data = cur_player_data
     update_players_json(cur_player_data)
     return render_template("quiz.html", tree_image=tree_image, 
                                     cur_score=cur_player_data["cur_score"], 
@@ -289,18 +290,18 @@ def next_question():
                                     max_score=max_score,
                                     message="What is the name of this tree?",
                                     feedback_msg = "Temp Feedback Msg",
-                                    hide_next_btn=True)
+                                    hide_next_btn=True,
+                                    username=username)
     
-@app.route('/submit/', methods=['GET', 'POST'])
-def submit():
+@app.route('/submit/<username>', methods=['GET', 'POST'])
+def submit(username):
     """
     Module process the user inputed answer, checks if its correct, and 
     displays appropriete feedback message and shows the next question button when
     required.
     """    
-    global glob_cur_player_data
-    
-    cur_player_data = glob_cur_player_data
+    all_players_data = read_json_data("data/players.json")
+    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
     answer = request.form["answer"]
     answer = answer.lower()
     if request.method == "POST":
@@ -311,7 +312,6 @@ def submit():
         else:
             feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         
-        glob_cur_player_data = cur_player_data
         update_players_json(cur_player_data)
         return render_template("quiz.html", tree_image=tree_image, 
                                             cur_score=cur_player_data["cur_score"], 
@@ -320,15 +320,17 @@ def submit():
                                             max_score=max_score,
                                             message=feedback_msg,
                                             feedback_msg = feedback_msg,
-                                            hide_next_btn=hide_next_btn)
+                                            hide_next_btn=hide_next_btn,
+                                            username=username)
                                             
-@app.route('/finsh_game/', methods=['GET', 'POST'])                                            
-def finsh_game():
+@app.route('/game_over/<username>', methods=['GET', 'POST'])                                            
+def game_over(username):
     """
     Module renders game_over.html with updated leaderboard and 
     appropriete final message.
     """  
-    cur_player_data = glob_cur_player_data
+    all_players_data = read_json_data("data/players.json")
+    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
     # Read in leaderboard
     leader = read_json_data("data/leaderboard.json")
     # Compare final score to users past high scores and the leaderboard
@@ -346,10 +348,11 @@ def finsh_game():
     return render_template("game_over.html", score_str=score_str, 
                                              result_msg=result_msg, 
                                              leader=leader, 
-                                             page_title="Game_Over")
+                                             page_title="Game_Over",
+                                             username=username)
     
-@app.route('/leader', methods=['GET', 'POST'])
-def leader(): 
+@app.route('/leaderboard', methods=['GET', 'POST'])
+def leaderboard(): 
     """
     Module returns leader.html.
     """

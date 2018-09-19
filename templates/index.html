@@ -10,8 +10,10 @@
 
     </div>
     <div class="sign-in">
-        <form method="POST" action="/check_name/">
-            <input class="name-input" type="text" id="username" name="username" placeholder=" Enter Username">
+        <form method="POST" action="/check_username">
+            <input class="name-input" type="text" id="username" name="username" 
+            placeholder=" Enter username (alphanumeric)" pattern="^[a-zA-Z0-9]+$" required/>
+            
             <button class="btn sign-in-btn">Sign in</button>
         </form>
     </div>
@@ -21,7 +23,7 @@
     <div class="start-btn-container">
         {% if hide_start_btn == False %}
         <p class="start-game-msg">Click Play Game or enter a different username!</p>
-        <form method="POST" action="/next_q/">
+        <form method="POST" action="/question/{{ username }}">
             <button class="btn start-btn">Play Game!</button>
         </form>
         {% endif %}

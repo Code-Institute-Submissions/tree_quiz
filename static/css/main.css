@@ -97,6 +97,7 @@
 }
 .name-input{
     margin:5px;
+    width: 210px;
 }
 .sign-in-btn{
     border-style: solid;

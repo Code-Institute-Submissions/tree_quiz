@@ -25,8 +25,9 @@
                 <p class="message">{{ message }}</p>
                 {% if hide_next_btn %}
                     <div class="submit_container">
-                        <form method="POST" action="/submit/">
-                            <input class="answer-intput" type="text" id="answer" name="answer" placeholder=" Enter Answer">
+                        <form method="POST" action="/submit/{{ username }}">
+                            <input class="answer-intput" type="text" id="answer" name="answer" 
+                            placeholder=" Enter Answer" pattern="^[a-zA-Z0-9]+$" required/>
                         <button class="btn submit-btn">Submit Answer!</button>
                         </form>
                     </div>
@@ -34,11 +35,11 @@
                     
                     <div class="next_btn_container">
                         {% if cur_question < 10 %}
-                            <form method="POST" action="/next_q/">
+                            <form method="POST" action="/question/{{ username }}">
                                 <button class="btn next-btn">Next Question!</button>
                             </form>
                         {% else %}
-                            <form method="POST" action="/finsh_game/">
+                            <form method="POST" action="/game_over/{{ username }}">
                                 <button class="btn ">Finish Game</button>
                             </form>
                         {% endif %}    
