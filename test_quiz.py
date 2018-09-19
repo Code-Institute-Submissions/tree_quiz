@@ -3,35 +3,37 @@ from string import ascii_uppercase
 import run
 import os
 import json
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request
 
 class TestQuiz(unittest.TestCase):
-    
+   
     def test_get_cur_player_data(self):
         """
-        If the username has been used before returns the user info,
-        else adds the new new users info to the all_player_data list
+        Tests get_cur_player_data(), which checks if a username is in 
+        the player database, returns the users info or else creates user info 
+        for the new user.
         """
         # Check: Empty player data, add user
         all_player_data_old = []
-        cur_player_data = {"name": "name1","game_num": 0, 
+        cur_player_data = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
-        all_player_data_new = [{"name": "name1","game_num": 0, 
+        all_player_data_new = [{"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
         self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
         
-        # Check: 2 players, user new played
-        all_player_data_old = [{"name": "name1","game_num": 0, 
-            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
+        # Check: 2 players, user new 
+        all_player_data_old = [{"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}]
-        cur_player_data = {"name": "name3","game_num": 0, 
+        cur_player_data = {"name": "name3","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
-        all_player_data_new = [{"name": "name1","game_num": 0, 
-            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
-            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
+        all_player_data_new = [{"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}]
         self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name3", all_player_data_old))
-        # Check: 3 players, user has played before
+        
+        # Check: 3 players, user in database
         all_player_data_old = [{"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 90}, {"name": "name3","game_num": 0, 
@@ -40,6 +42,7 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
         all_player_data_new = all_player_data_old
         self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("name1", all_player_data_old))
+        
         # Check: Username not case sensitive
         all_player_data_old = [{"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}, {"name": "name2","game_num": 0, 
@@ -49,38 +52,21 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 100}
         all_player_data_new = all_player_data_old
         self.assertEqual((cur_player_data, all_player_data_new), run.get_cur_player_data("NamE1", all_player_data_old))
-        
+
     def test_get_q_data(self):
         """
-        Test test_get_q_data(index). Gets the tree name and url of tree image
-        for the next question
+        Tests test_get_q_data(index), which returns the tree name, url of tree image
+        and max possible score for a given question number.
         """
         # Check if funciton gets the correct q data
-        self.assertEqual(("arbutus", "/static/img/arbutus.jpg"), run.get_q_data(1))
-        self.assertEqual(("holly", "/static/img/holly.jpg"), run.get_q_data(6))
-        
-    def test_check_answer(self):
-        "Test check_answer(index, answer), returns True or False"
-        # Check for all right answers
-        self.assertTrue(run.check_answer(1,"arbutus"))
-        self.assertTrue(run.check_answer(2,"ash"))
-        self.assertTrue(run.check_answer(3,"birch"))
-        self.assertTrue(run.check_answer(4,"hawthorn"))
-        self.assertTrue(run.check_answer(5,"hazel"))
-        self.assertTrue(run.check_answer(6,"holly"))
-        self.assertTrue(run.check_answer(7,"oak"))
-        self.assertTrue(run.check_answer(8,"pine"))
-        self.assertTrue(run.check_answer(9,"willow"))
-        self.assertTrue(run.check_answer(10,"yew"))
-        # Check for wrong answer
-        self.assertFalse(run.check_answer(2,"arbutus"))
-        # Check accepts captialized
-        self.assertTrue(run.check_answer(1,"ArbuTus"))
+        self.assertEqual(("arbutus", "/static/img/arbutus.jpg", 10), run.get_q_data(1))
+        self.assertEqual(("holly", "/static/img/holly.jpg", 60), run.get_q_data(6))
     
     def test_add_to_score(self):
         """
-        Test if first attemp current score gets incremented by 10, else
-        gets incremented by 5
+        Tests add_to_score, which increments the users score by 10
+        if user answers question correctly on first attemp, or 
+        by 5 if user answers correctly on second attempt
         """
         # Check current score incrented by 10 if attempt = 1
         cur_player_data = {"name": "name1","game_num": 0, 
@@ -92,10 +78,66 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 0, "attempt": 2, "cur_score": 10, "high_score": 0}
         new_cur_player_data = run.add_to_score(cur_player_data)
         self.assertEqual(new_cur_player_data["cur_score"], 15)
+    
+    def test_process_answer(self):
+        """
+        Tests process_answer(), which checks if the users entered answer is correct,
+        and returns appropriete feedback message and whether to allow access to 
+        next question button.
+        """
+        # Check: For correct answer, first attempt
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
         
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 0}
+        tree_name = "arbutus"
+        answer = "arbutus"
+        feedback_msg, hide_next_btn, cur_player_data = run.process_answer(answer, tree_name, cur_player_data)
+        self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
+        self.assertFalse(hide_next_btn)
+        self.assertEqual(cur_player_data, expected_cur_player_data)
+        
+        # Check: For correct answer, second attempt
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 2, "cur_score": 0, "high_score": 0}
+        
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 2, "cur_score": 5, "high_score": 0}
+        tree_name = "arbutus"
+        answer = "arbutus"
+        feedback_msg, hide_next_btn, cur_player_data = run.process_answer(answer, tree_name, cur_player_data)
+        self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
+        self.assertFalse(hide_next_btn)
+        self.assertEqual(cur_player_data, expected_cur_player_data)
+        
+        # Check: For wrong answer, first attempt
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 2, "cur_score": 0, "high_score": 0}
+        tree_name = "arbutus"
+        answer = "birch"
+        feedback_msg, hide_next_btn, cur_player_data = run.process_answer(answer, tree_name, cur_player_data)
+        self.assertEqual(feedback_msg, "Birch is not correct, but you still have a second try.")
+        self.assertTrue(hide_next_btn)
+        self.assertEqual(cur_player_data, expected_cur_player_data)
+        # Check: For wrong answer, first second attempt
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 2, "cur_score": 0, "high_score": 0}
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 2, "cur_score": 0, "high_score": 0}
+        tree_name = "arbutus"
+        answer = "birch"
+        feedback_msg, hide_next_btn, cur_player_data = run.process_answer(answer, tree_name, cur_player_data)
+        self.assertEqual(feedback_msg, "Wrong again! Arbutus is the correct answer.")
+        self.assertFalse(hide_next_btn)
+        self.assertEqual(cur_player_data, expected_cur_player_data)
+            
     def test_add_to_leaderboard(self):
         """
-        Testing of add_to_leader_board(). Checks all possible scenario of leaderboard and final scores. 
+        Testing of add_to_leader_board(), which checks if the users current score 
+        is a personnel best and if that personnel best makes it onto a 5 person leaderboard.
         """
         
         # Test first player, empty leaderboard
@@ -154,7 +196,10 @@ class TestQuiz(unittest.TestCase):
         self.assertFalse(made_leader)
         
     def test_evaluate_result(self):
-
+        """
+        Tests evaluate_results(), which compares the users final result 
+        against there past scores and the leaderboard, returns appropriete message.
+        """
         # Check: Player scores 0
         cur_player_data_old = {"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
@@ -168,13 +213,13 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, leader_old)
         
         # Check: Players first game, gets 100/100
-        cur_player_data_old = {"name": "name1","game_num": 0, 
+        cur_player_data_old = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 100, "high_score": 0}
         leader_old = []
         expected_msg = "Congradulations! You got top marks on your first game. Check out the leaderboard." 
-        expected_cur_player_data = {"name": "name1","game_num": 0, 
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 100, "high_score": 100}
-        expected_leader = ['name1', 100, 0]    
+        expected_leader = ['name1', 100, 1]    
         
         result_msg, cur_player_data_new, leader_new = run.evaluate_result( 
                                                           cur_player_data_old, leader_old)
@@ -183,13 +228,13 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, expected_leader)
         
         # Check: Players first game, gets on leaderboard
-        cur_player_data_old = {"name": "name6","game_num": 0, 
+        cur_player_data_old = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 0}
-        leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
+        leader_old =["name1", 100, 1, "name2", 90, 1, "name3", 30, 1, "name4", 20, 1, "name5", 10, 0]
         expected_msg = "Excelent! First game and you made it on the leaderboard." 
-        expected_cur_player_data = {"name": "name6","game_num": 0, 
+        expected_cur_player_data = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 10}
-        expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name6", 10, 0]
+        expected_leader = ["name1", 100, 1, "name2", 90, 1, "name3", 30, 1, "name4", 20, 1, "name6", 10, 1]
         
         result_msg, cur_player_data_new, leader_new = run.evaluate_result( 
                                                           cur_player_data_old, leader_old)
@@ -198,11 +243,11 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, expected_leader)
         
         # Check: Players first game, did not make it on leaderboard
-        cur_player_data_old = {"name": "name6","game_num": 0, 
+        cur_player_data_old = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 0}
         leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         expected_msg = "Good first try. Have another game and try to make it onto leaderboard."
-        expected_cur_player_data = {"name": "name6","game_num": 0, 
+        expected_cur_player_data = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 5}
         expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         
@@ -213,11 +258,11 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, expected_leader)
         
         # Check: Players before, scored personnel best, but did not make leaderboard
-        cur_player_data_old = {"name": "name6","game_num": 1, 
+        cur_player_data_old = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 0}
         leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         expected_msg = "You are improving. Keep trying to get top marks."
-        expected_cur_player_data = {"name": "name6","game_num": 1, 
+        expected_cur_player_data = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 5}
         expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         
@@ -228,13 +273,13 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, expected_leader)
         
         # Check: Players before, scored personnel best, made it on leaderboard
-        cur_player_data_old = {"name": "name6","game_num": 1, 
+        cur_player_data_old = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 5}
         leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         expected_msg = "Excelent! You made it onto the leaderboard with this new personnel best."
-        expected_cur_player_data = {"name": "name6","game_num": 1, 
+        expected_cur_player_data = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 10}
-        expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name6", 10, 1]
+        expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name6", 10, 2]
         
         result_msg, cur_player_data_new, leader_new = run.evaluate_result( 
                                                           cur_player_data_old, leader_old)
@@ -243,11 +288,11 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(leader_new, expected_leader)
         
         # Check: Players before, score less than high score
-        cur_player_data_old = {"name": "name6","game_num": 1, 
+        cur_player_data_old = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 10}
         leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         expected_msg = "Good job, but you didn't beat your own top score of 10"
-        expected_cur_player_data = {"name": "name6","game_num": 1, 
+        expected_cur_player_data = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 5, "high_score": 10}
         expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
         
@@ -256,4 +301,38 @@ class TestQuiz(unittest.TestCase):
         self.assertEqual(result_msg, expected_msg)
         self.assertEqual(cur_player_data_new, expected_cur_player_data)
         self.assertEqual(leader_new, expected_leader)
+        
+    def test_get_welcome_msg(self):
+        """
+        Tests get_welcome_msg(), which returns the appropriete welcome message based
+        on the users playing history.
+        """
+        # New player
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        expected_welcome_msg ="Welcome name1. This looks like your first game."
+        expected_cur_player_data = {"name": "name1","game_num": 0, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        welcome_msg, cur_player_data = run.get_welcome_msg(cur_player_data)
+        self.assertEqual((welcome_msg, cur_player_data), (expected_welcome_msg, cur_player_data))
+        
+        # Player mid-game
+        cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 5, "attempt": 1, "cur_score": 0, "high_score": 0}
+        expected_welcome_msg ="Welcome back name1. Looks like you left us mid game. You are currently on question 5."
+        expected_cur_player_data = {"name": "name1","game_num": 1, 
+            "cur_question": 4, "attempt": 1, "cur_score": 0, "high_score": 0}
+        welcome_msg, cur_player_data = run.get_welcome_msg(cur_player_data)
+        
+        self.assertEqual((welcome_msg, cur_player_data), (expected_welcome_msg, expected_cur_player_data))
+        
+        # Player has played before, new game
+        cur_player_data = {"name": "name1","game_num": 2, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        expected_welcome_msg ="Welcome back name1. You have played this game 1 times before." 
+            
+        expected_cur_player_data = {"name": "name1","game_num": 2, 
+            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+        welcome_msg, cur_player_data = run.get_welcome_msg(cur_player_data)
+        self.assertEqual((welcome_msg, cur_player_data), (expected_welcome_msg, expected_cur_player_data))
 
