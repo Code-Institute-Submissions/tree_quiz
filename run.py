@@ -257,15 +257,11 @@ def check_username():
     username = request.form["username"]
     if request.method == "POST":
         
-        if username =="":
-            welcome_msg = "Can not accept blank username. Please enter a valid username."
-            hide_start_btn = True
-        else:
-            all_players_data = read_json_data("data/players.json")
-            cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-            welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
-            update_players_json(cur_player_data)
-            hide_start_btn = False
+        all_players_data = read_json_data("data/players.json")
+        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
+        update_players_json(cur_player_data)
+        hide_start_btn = False
 
         return render_template("index.html", welcome_msg=welcome_msg, 
                                              hide_start_btn=hide_start_btn, 
@@ -310,12 +306,7 @@ def submit(username):
     answer = answer.lower()
     if request.method == "POST":
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
-        if answer == "":
-            feedback_msg = "You can not submit a blank entry!"
-            hide_next_btn = True
-        else:
-            feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
-        
+        feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         update_players_json(cur_player_data)
         title = "Q." + str(cur_player_data["cur_question"])
         return render_template("quiz.html", tree_image=tree_image, 
