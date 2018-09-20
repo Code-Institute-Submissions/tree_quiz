@@ -60,19 +60,16 @@ def get_welcome_msg(cur_player_data):
     Module returns the appropriete welcome message based on he users playing history.
     """    
     if cur_player_data["cur_question"] != 0:
-        welcome_msg = ("Welcome back " + cur_player_data["name"]
-            + ". Looks like you left us mid game. You are currently on question " 
-            + str(cur_player_data["cur_question"]) + ".")
+        welcome_msg = "Welcome back {}. Looks like you left us mid game. You are currently on question {}." \
+                       .format(cur_player_data["name"], str(cur_player_data["cur_question"]))
         # Reduce cur_question by 1, load question automaticaly increases by one later   
         cur_player_data["cur_question"] -= 1
     elif cur_player_data["game_num"] != 1:
-        welcome_msg = ("Welcome back " + cur_player_data["name"] 
-            + ". You have played this game " 
-            + str(cur_player_data["game_num"]-1) 
-            + " times before.")
+        welcome_msg = "Welcome back {}. You have played this game {} times before." \
+                       .format(cur_player_data["name"], str(cur_player_data["game_num"]-1))
     else:
-        welcome_msg = "Welcome " + cur_player_data["name"] + ". This looks like your first game."
-        
+        welcome_msg = "Welcome {}. This looks like your first game.".format(cur_player_data["name"])
+    
     return welcome_msg, cur_player_data
  
 def get_q_data(cur_question):
@@ -110,14 +107,14 @@ def process_answer(answer, tree_name, cur_player_data):
     """
     if answer == tree_name:
         cur_player_data = add_to_score(cur_player_data)
-        feedback_msg = tree_name.title() + " is the correct answer!"
+        feedback_msg =  "{} is the correct answer!".format(tree_name.title())
         hide_next_btn = False
     elif answer != tree_name and cur_player_data["attempt"] < 2:
-        feedback_msg = answer.title() + " is not correct, but you still have a second try."
+        feedback_msg =  "{} is not correct, but you still have a second try.".format(answer.title())
         hide_next_btn = True
         cur_player_data["attempt"] += 1
     else:
-        feedback_msg = "Wrong again! " + tree_name.title() +" is the correct answer."
+        feedback_msg = "Wrong again! {} is the correct answer.".format(tree_name.title())
         hide_next_btn = False
 
     return feedback_msg, hide_next_btn, cur_player_data
