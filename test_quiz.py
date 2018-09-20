@@ -55,11 +55,13 @@ class TestQuiz(unittest.TestCase):
 
     def test_get_q_data(self):
         """
-        Tests test_get_q_data(index), which returns the tree name, url of tree image
+        Tests test_get_q_data(question), which returns the tree name, url of tree image
         and max possible score for a given question number.
         """
         # Check if funciton gets the correct q data
+        
         self.assertEqual(("arbutus", "/static/img/arbutus.jpg", 10), run.get_q_data(1))
+        self.assertEqual(("ash", "/static/img/ash.jpg", 20), run.get_q_data(2))
         self.assertEqual(("holly", "/static/img/holly.jpg", 60), run.get_q_data(6))
     
     def test_add_to_score(self):

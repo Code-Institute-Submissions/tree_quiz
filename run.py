@@ -75,21 +75,20 @@ def get_welcome_msg(cur_player_data):
         
     return welcome_msg, cur_player_data
  
-def get_q_data(index):
+def get_q_data(cur_question):
     """
     Module returns the tree name, url of tree image
     and max possible score for a given question number.
     """
-    with open("data/tree_lib.json", "r") as json_quiz_data:
-        quiz_data = json.load(json_quiz_data)
-        
-        max_score = index*10
-        for obj in quiz_data:
-            if obj["index"] == index:  
-                tree_name = obj["tree_name"]
-                tree_image = obj["tree_image"]
-        
-        return tree_name, tree_image, max_score
+    
+    quiz_data = read_json_data("data/tree_lib.json")
+    max_score = cur_question*10
+    for obj in quiz_data:
+        if obj["question"] == cur_question:  
+            tree_name = obj["tree_name"]
+            tree_image = obj["tree_image"]
+    
+    return tree_name, tree_image, max_score
 
 def add_to_score(cur_player_data):
     """
@@ -277,6 +276,7 @@ def question(username):
 
     all_players_data = read_json_data("data/players.json")
     cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+    write_json_data(all_players_data, "data/players.json")
     cur_player_data["cur_question"] += 1
     cur_player_data["attempt"] = 1
     tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
@@ -302,6 +302,7 @@ def submit(username):
     """    
     all_players_data = read_json_data("data/players.json")
     cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+    print(cur_player_data)
     answer = request.form["answer"]
     answer = answer.lower()
     if request.method == "POST":
