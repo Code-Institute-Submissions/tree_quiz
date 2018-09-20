@@ -1,5 +1,4 @@
 import unittest
-from string import ascii_uppercase
 import run
 import os
 import json

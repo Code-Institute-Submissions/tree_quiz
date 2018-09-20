@@ -27,13 +27,17 @@ User stories were developed to guide game play and desired functions.
 __Mockups__
 
 Mockups were developed using a free online mockup tool, FluidUI. The mockup wireframes allowed for greater visualisation of the how the application should look before starting creating the HTML templates. 
-JPGs of the mockups can be found at GitHub repository for the project at https://github.com/dcasey720/tree_quiz/tree/master/mockups.
+JPGs of the mockups can be found at GitHub repository for the project at:
+
+https://github.com/dcasey720/tree_quiz/tree/master/mockups.
 
 Features
 -----------------
 In this section, you should go over the different parts of your project, and describe each in a sentence or so.
 
 __Existing Features__
+
+
 
 __Features Left to Implement__
 * Include green/ read to indicate if the answers were wrong or right.
@@ -45,13 +49,45 @@ __Features Left to Implement__
 Technologies Used
 -----------------------
 
+* __FluidUI__ (https://www.fluidui.com) was used to develop wireframes for the initial UI design mockups.
+* __Python3__ (https://docs.python.org/3/) was used to develop all back-end code.
+* __HTML5__ (https://www.w3.org/TR/html5/) was used to develop front-end templates.
+* __CSS__ (https://www.w3.org/Style/CSS/) was used for styling of front-end templates.
+* __Flask__ (http://flask.pocoo.org/) microframwork was used through out the project in interacting between the back-end code and front-end templates, rendering templates and aquiring data.
+* __json__ (http://www.json.org/) was used to store and access game play data.
+* __Bootstrap 3.3.7__ (https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css) was used for more effective CSS layout styling. 
+    - __Boostrap Grid__ system was used for content arrangment and responsive behavour when moving between different screen sizes
+    - __Boostrap Navbar__ was used for the main navigation. Collapsible menu was utilised for lower screen resolutions.
+    - __Bootstrap Forms Controls__ were used for the user actions.
+* __Font-Awesome 5.3.1__ (https://use.fontawesome.com/releases/v5.3.1/css/all.css) was for the icons in the header and footer.
+* __Unittest__ (https://docs.python.org/3/library/unittest.html) unit testing framework was used for the testing of none template rendering functions.
+
 Testing
 -----------------------
 
 Deployment
 ------------------------
 
+__Hosting__
+
+The application is hosted on Heroku and can be accessed at:
+
+https://irish-tree-quiz.herokuapp.com/
+
+__Deployed vs Development__
+
+There is only one code difference between the deployed and development application version.
+
+|       Code       | Deployed | Development |
+| ---------------- | -------- | ----------- | 
+| app.run(debug= ) |  False   |   True      |       
+
+Leaderboard.json and players.json are updated during game play and so may differ between the development and deployed versions.
+
 Credits
 -----------------------------
 __Media__
-The photos used in this site were obtained from https://treecouncil.ie/tree-advice/native-species/
+
+The photos used in this site were obtained from:
+
+https://treecouncil.ie/tree-advice/native-species/
