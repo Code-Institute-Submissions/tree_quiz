@@ -20,20 +20,15 @@ def write_json_data(data, json_file):
     with open(json_file, "w") as json_data:           
         json.dump(data, json_data)
 # not tested        
-def update_players_json(cur_player_data):
+def update_all_players_data(cur_player_data, all_players_data):
     """
-    Updates players.json file with cur_player_data
+    Updates all_players_data file with cur_player_data
     """
-    all_players_data = read_json_data("data/players.json")
     for obj in all_players_data:
         if obj["name"] == cur_player_data["name"]:
-            obj["game_num"] = cur_player_data["game_num"]
-            obj["cur_question"] = cur_player_data["cur_question"]
-            obj["attempt"] = cur_player_data["attempt"]
-            obj["cur_score"] = cur_player_data["cur_score"]
-            obj["high_score"] = cur_player_data["high_score"]
-            
-    write_json_data(all_players_data,"data/players.json")
+            index = all_players_data.index(obj)
+            all_players_data[index] = cur_player_data
+            break
 
 def get_cur_player_data(username, all_players_data):
     """
@@ -228,7 +223,7 @@ def evaluate_result(cur_player_data, leader):
     else:
         # Scored less than personnel high score
         leader = leader
-        result_msg = "Good job, but you didn't beat your own top score of " + str(cur_player_data["high_score"])
+        result_msg = "Good job, but you didn't beat your own top score of {}".format(str(cur_player_data["high_score"]))
     
     return result_msg, cur_player_data, leader
     
@@ -256,7 +251,10 @@ def check_username():
         all_players_data = read_json_data("data/players.json")
         cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
         welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
-        update_players_json(cur_player_data)
+        # Update players.json
+        all_players_data = read_json_data("data/players.json")
+        update_all_players_data(cur_player_data, all_players_data)
+        write_json_data(all_players_data,"data/players.json")
         hide_start_btn = False
 
         return render_template("index.html", welcome_msg=welcome_msg, 
@@ -277,7 +275,10 @@ def question(username):
     cur_player_data["cur_question"] += 1
     cur_player_data["attempt"] = 1
     tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
-    update_players_json(cur_player_data)
+    # Update players.json
+    all_players_data = read_json_data("data/players.json")
+    update_all_players_data(cur_player_data, all_players_data)
+    write_json_data(all_players_data,"data/players.json")
     title = "Question " + str(cur_player_data["cur_question"])
     return render_template("quiz.html", tree_image=tree_image, 
                                     cur_score=cur_player_data["cur_score"], 
@@ -305,7 +306,10 @@ def submit(username):
     if request.method == "POST":
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
         feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
-        update_players_json(cur_player_data)
+        # Update players.json
+        all_players_data = read_json_data("data/players.json")
+        update_all_players_data(cur_player_data, all_players_data)
+        write_json_data(all_players_data,"data/players.json")
         title = "Q." + str(cur_player_data["cur_question"])
         return render_template("quiz.html", tree_image=tree_image, 
                                             cur_score=cur_player_data["cur_score"], 
@@ -339,7 +343,9 @@ def game_over(username):
     cur_player_data["cur_question"] = 0
     cur_player_data["game_num"] += 1
     # Update players.json
-    update_players_json(cur_player_data)
+    all_players_data = read_json_data("data/players.json")
+    update_all_players_data(cur_player_data, all_players_data)
+    write_json_data(all_players_data,"data/players.json")
     return render_template("game_over.html", score_str=score_str, 
                                              result_msg=result_msg, 
                                              leader=leader, 
