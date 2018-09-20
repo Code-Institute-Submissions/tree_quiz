@@ -1,6 +1,6 @@
 import os
 import json
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
@@ -29,6 +29,7 @@ def update_all_players_data(cur_player_data, all_players_data):
             index = all_players_data.index(obj)
             all_players_data[index] = cur_player_data
             break
+    return all_players_data
 
 def get_cur_player_data(username, all_players_data):
     """
@@ -253,7 +254,7 @@ def check_username():
         welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
-        update_all_players_data(cur_player_data, all_players_data)
+        all_players_data = update_all_players_data(cur_player_data, all_players_data)
         write_json_data(all_players_data,"data/players.json")
         hide_start_btn = False
 
@@ -265,92 +266,82 @@ def check_username():
 @app.route('/question/<username>', methods=['GET', 'POST'])
 def question(username):
     """
-    Module returns quiz.html with the next question in the quiz, based on
-    cur_player_data.
+    Module returns either the next question or answer feedback displayed on quiz.html
+    if the current question is less than 10 or game_over.html current quesion is 10. 
     """
-
     all_players_data = read_json_data("data/players.json")
     cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-    write_json_data(all_players_data, "data/players.json")
-    cur_player_data["cur_question"] += 1
-    cur_player_data["attempt"] = 1
-    tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
-    # Update players.json
-    all_players_data = read_json_data("data/players.json")
-    update_all_players_data(cur_player_data, all_players_data)
-    write_json_data(all_players_data,"data/players.json")
     title = "Question " + str(cur_player_data["cur_question"])
-    return render_template("quiz.html", tree_image=tree_image, 
-                                    cur_score=cur_player_data["cur_score"], 
-                                    attempt=cur_player_data["attempt"], 
-                                    cur_question=cur_player_data["cur_question"], 
-                                    max_score=max_score,
-                                    message="What is the name of this tree?",
-                                    feedback_msg = "Temp Feedback Msg",
-                                    hide_next_btn=True,
-                                    username=username,
-                                    title=title)
     
-@app.route('/submit/<username>', methods=['GET', 'POST'])
-def submit(username):
-    """
-    Module process the user inputed answer, checks if its correct, and 
-    displays appropriete feedback message and shows the next question button when
-    required.
-    """    
-    all_players_data = read_json_data("data/players.json")
-    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-    print(cur_player_data)
-    answer = request.form["answer"]
-    answer = answer.lower()
+    # For submitting answer
     if request.method == "POST":
+        answer = request.form["answer"].lower()
+        all_players_data = read_json_data("data/players.json")
+        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
-        feedback_msg, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
+        message, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
-        update_all_players_data(cur_player_data, all_players_data)
+        all_players_data = update_all_players_data(cur_player_data, all_players_data)
         write_json_data(all_players_data,"data/players.json")
-        title = "Q." + str(cur_player_data["cur_question"])
+        
         return render_template("quiz.html", tree_image=tree_image, 
                                             cur_score=cur_player_data["cur_score"], 
                                             attempt=cur_player_data["attempt"], 
                                             cur_question=cur_player_data["cur_question"], 
                                             max_score=max_score,
-                                            message=feedback_msg,
-                                            feedback_msg = feedback_msg,
+                                            message=message,
                                             hide_next_btn=hide_next_btn,
                                             username=username,
                                             title=title)
-                                            
-@app.route('/game_over/<username>', methods=['GET', 'POST'])                                            
-def game_over(username):
-    """
-    Module renders game_over.html with updated leaderboard and 
-    appropriete final message.
-    """  
-    all_players_data = read_json_data("data/players.json")
-    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-    # Read in leaderboard
-    leader = read_json_data("data/leaderboard.json")
-    # Compare final score to users past high scores and the leaderboard
-    result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
-    # Write to leaderboard
-    write_json_data(leader, "data/leaderboard.json")
-    score_str=str(cur_player_data["cur_score"])
-    # Reset game
-    cur_player_data["cur_score"] = 0
-    cur_player_data["attempt"] = 1
-    cur_player_data["cur_question"] = 0
-    cur_player_data["game_num"] += 1
-    # Update players.json
-    all_players_data = read_json_data("data/players.json")
-    update_all_players_data(cur_player_data, all_players_data)
-    write_json_data(all_players_data,"data/players.json")
-    return render_template("game_over.html", score_str=score_str, 
-                                             result_msg=result_msg, 
-                                             leader=leader, 
-                                             username=username,
-                                             title="Game Over",)
+    # For next question    
+    elif request.method == "GET" and cur_player_data["cur_question"] < 10: 
+        cur_player_data["cur_question"] += 1
+        cur_player_data["attempt"] = 1
+        message="What is the name of this tree?"
+        hide_next_btn=True
+        tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
+        # Update players.json
+        all_players_data = read_json_data("data/players.json")
+        all_players_data = update_all_players_data(cur_player_data, all_players_data)
+        write_json_data(all_players_data,"data/players.json")
+       
+        return render_template("quiz.html", tree_image=tree_image, 
+                                                cur_score=cur_player_data["cur_score"], 
+                                                attempt=cur_player_data["attempt"], 
+                                                cur_question=cur_player_data["cur_question"], 
+                                                max_score=max_score,
+                                                message=message,
+                                                hide_next_btn=hide_next_btn,
+                                                username=username,
+                                                title=title)
+    # For game over                                           
+    elif request.method == "GET" and cur_player_data["cur_question"] == 10:
+        all_players_data = read_json_data("data/players.json")
+        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        # Read in leaderboard
+        leader = read_json_data("data/leaderboard.json")
+        # Compare final score to users past high scores and the leaderboard
+        result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
+        # Write to leaderboard
+        write_json_data(leader, "data/leaderboard.json")
+        score_str=str(cur_player_data["cur_score"])
+        # Reset game
+        cur_player_data["cur_score"] = 0
+        cur_player_data["attempt"] = 1
+        cur_player_data["cur_question"] = 0
+        cur_player_data["game_num"] += 1
+        # Update players.json
+        all_players_data = read_json_data("data/players.json")
+        all_players_data = update_all_players_data(cur_player_data, all_players_data)
+        write_json_data(all_players_data,"data/players.json")
+        return render_template("game_over.html", score_str=score_str, 
+                                                 result_msg=result_msg, 
+                                                 leader=leader, 
+                                                 username=username,
+                                                 title="Game Over")
+                                                
+    return redirect('/')
     
 @app.route('/leaderboard', methods=['GET', 'POST'])
 def leaderboard(): 

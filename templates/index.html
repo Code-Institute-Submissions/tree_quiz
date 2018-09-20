@@ -28,7 +28,7 @@
     <div class="start-btn-container">
         {% if hide_start_btn == False %}
         <p class="start-game-msg">Click Play Game or enter a different username!</p>
-        <form method="POST" action="/question/{{ username }}">
+        <form method="GET" action="/question/{{ username }}">
             <button class="btn start-btn">Play Game!</button>
         </form>
         {% endif %}
