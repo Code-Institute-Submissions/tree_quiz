@@ -33,8 +33,8 @@
                     <div class="submit_container">
                         <form method="POST" action="/question/{{ username }}">
                             <input class="answer-intput" type="text" id="answer" name="answer" 
-                            placeholder=" Enter Answer" pattern="^[a-zA-Z0-9]+$" required/>
-                        <button class="btn submit-btn">Submit Answer!</button>
+                            placeholder=" Enter One Word Answer" pattern="^[a-zA-Z0-9]+$" autofocus required>
+                            <button class="btn submit-btn">Submit Answer!</button>
                         </form>
                     </div>
                 {% else %}
@@ -42,11 +42,11 @@
                     <div class="next_btn_container">
                         {% if cur_question < 10 %}
                             <form method="GET" action="/question/{{ username }}">
-                                <button class="btn next-btn">Next Question!</button>
+                                <button class="btn next-btn" autofocus>Next Question!</button>
                             </form>
                         {% else %}
                             <form method="GET" action="/question/{{ username }}">
-                                <button class="btn ">Finish Game</button>
+                                <button class="btn " autofocus>Finish Game</button>
                             </form>
                         {% endif %}    
                     </div>
