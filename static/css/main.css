@@ -96,8 +96,14 @@
     margin-bottom: 30px;
 }
 .name-input{
-    margin:5px;
+    margin: 5px;
     width: 210px;
+    padding: 4px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+    position: relative; left: 50%;
+    transform: translateX(-50%);
 }
 .sign-in-btn{
     border-style: solid;
@@ -123,6 +129,7 @@
 .tree_img {
     width: 100%;
     height: auto;
+    border-radius: 10px;
 }
 
 .question_num {
@@ -141,6 +148,12 @@
 
 .answer-intput{
     margin:5px;
+    width:200px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+    position: relative; left: 50%;
+    transform: translateX(-50%);
 
 }
 .submit-btn{
@@ -156,6 +169,14 @@
     border-width: 1px;
     border-color: #c68c53;
 }
+
+.finish-game-btn{
+    margin:5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #c68c53;
+}
+
 /* ------------------------------------------------------Game Over Styleing*/
 .leaderboard-table-game-over{
     margin-bottom: 10px;

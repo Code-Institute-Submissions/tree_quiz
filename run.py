@@ -46,7 +46,7 @@ def get_cur_player_data(username, all_players_data):
        
     if past_player == False:
         cur_player_data = {"name": username,"game_num": 1, 
-            "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
+            "cur_question": 1, "attempt": 1, "cur_score": 0, "high_score": 0}
         all_players_data.append(cur_player_data)
     
     return cur_player_data, all_players_data
@@ -55,11 +55,11 @@ def get_welcome_msg(cur_player_data):
     """
     Module returns the appropriete welcome message based on he users playing history.
     """    
-    if cur_player_data["cur_question"] != 0:
+    if cur_player_data["cur_question"] > 1:
         welcome_msg = "Welcome back {}. Looks like you left us mid game. You are currently on question {}." \
                        .format(cur_player_data["name"], str(cur_player_data["cur_question"]))
         # Reduce cur_question by 1, load question automaticaly increases by one later   
-        cur_player_data["cur_question"] -= 1
+        # cur_player_data["cur_question"] -= 1
     elif cur_player_data["game_num"] != 1:
         welcome_msg = "Welcome back {}. You have played this game {} times before." \
                        .format(cur_player_data["name"], str(cur_player_data["game_num"]-1))
@@ -103,13 +103,16 @@ def process_answer(answer, tree_name, cur_player_data):
     """
     if answer == tree_name:
         cur_player_data = add_to_score(cur_player_data)
+        cur_player_data["cur_question"] += 1
+        cur_player_data["attempt"] = 1
         feedback_msg =  "{} is the correct answer!".format(tree_name.title())
         hide_next_btn = False
-    elif answer != tree_name and cur_player_data["attempt"] < 2:
+    elif answer != tree_name and cur_player_data["attempt"] == 1:
+        cur_player_data["attempt"] = 2
         feedback_msg =  "{} is not correct, but you still have a second try.".format(answer.title())
         hide_next_btn = True
-        cur_player_data["attempt"] += 1
     else:
+        cur_player_data["cur_question"] += 1
         feedback_msg = "Wrong again! {} is the correct answer.".format(tree_name.title())
         hide_next_btn = False
 
@@ -251,6 +254,7 @@ def check_username():
         
         all_players_data = read_json_data("data/players.json")
         cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        write_json_data(all_players_data,"data/players.json")
         welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
@@ -276,9 +280,12 @@ def question(username):
     # For submitting answer
     if request.method == "POST":
         answer = request.form["answer"].lower()
-        all_players_data = read_json_data("data/players.json")
-        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        # all_players_data = read_json_data("data/players.json")
+        # cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
+        cur_question = cur_player_data["cur_question"]
+        # Process data returns cur_player_data for the next question
+        # Cur_question displayed are for question just answered
         message, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
@@ -288,7 +295,7 @@ def question(username):
         return render_template("quiz.html", tree_image=tree_image, 
                                             cur_score=cur_player_data["cur_score"], 
                                             attempt=cur_player_data["attempt"], 
-                                            cur_question=cur_player_data["cur_question"], 
+                                            cur_question=cur_question, 
                                             max_score=max_score,
                                             message=message,
                                             hide_next_btn=hide_next_btn,
@@ -296,7 +303,7 @@ def question(username):
                                             title=title)
     # For next question    
     elif request.method == "GET" and cur_player_data["cur_question"] < 10: 
-        cur_player_data["cur_question"] += 1
+
         cur_player_data["attempt"] = 1
         message="What is the name of this tree?"
         hide_next_btn=True
