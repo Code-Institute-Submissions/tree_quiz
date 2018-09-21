@@ -104,7 +104,6 @@ def process_answer(answer, tree_name, cur_player_data):
     if answer == tree_name:
         cur_player_data = add_to_score(cur_player_data)
         cur_player_data["cur_question"] += 1
-        cur_player_data["attempt"] = 1
         feedback_msg =  "{} is the correct answer!".format(tree_name.title())
         hide_next_btn = False
     elif answer != tree_name and cur_player_data["attempt"] == 1:
@@ -249,21 +248,15 @@ def check_username():
     required.
     """
 
-    username = request.form["username"]
     if request.method == "POST":
-        
+        username = request.form["username"]
         all_players_data = read_json_data("data/players.json")
         cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
         write_json_data(all_players_data,"data/players.json")
         welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
-        # Update players.json
-        all_players_data = read_json_data("data/players.json")
-        all_players_data = update_all_players_data(cur_player_data, all_players_data)
-        write_json_data(all_players_data,"data/players.json")
-        hide_start_btn = False
 
         return render_template("index.html", welcome_msg=welcome_msg, 
-                                             hide_start_btn=hide_start_btn, 
+                                             hide_start_btn=False, 
                                              username=username,
                                              title="Welcome")
         
@@ -280,12 +273,9 @@ def question(username):
     # For submitting answer
     if request.method == "POST":
         answer = request.form["answer"].lower()
-        # all_players_data = read_json_data("data/players.json")
-        # cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
         cur_question = cur_player_data["cur_question"]
-        # Process data returns cur_player_data for the next question
-        # Cur_question displayed are for question just answered
+        # Process_answer() returns cur_player_data for the next question
         message, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
@@ -302,11 +292,8 @@ def question(username):
                                             username=username,
                                             title=title)
     # For next question    
-    elif request.method == "GET" and cur_player_data["cur_question"] < 10: 
-
+    elif request.method == "GET" and cur_player_data["cur_question"] <= 10: 
         cur_player_data["attempt"] = 1
-        message="What is the name of this tree?"
-        hide_next_btn=True
         tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
         # Update players.json
         all_players_data = read_json_data("data/players.json")
@@ -318,30 +305,28 @@ def question(username):
                                                 attempt=cur_player_data["attempt"], 
                                                 cur_question=cur_player_data["cur_question"], 
                                                 max_score=max_score,
-                                                message=message,
-                                                hide_next_btn=hide_next_btn,
+                                                message="What is the name of this tree?",
+                                                hide_next_btn=True,
                                                 username=username,
                                                 title=title)
     # For game over                                           
-    elif request.method == "GET" and cur_player_data["cur_question"] == 10:
+    elif request.method == "GET" and cur_player_data["cur_question"] > 10:
         all_players_data = read_json_data("data/players.json")
         cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-        # Read in leaderboard
         leader = read_json_data("data/leaderboard.json")
-        # Compare final score to users past high scores and the leaderboard
         result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
-        # Write to leaderboard
         write_json_data(leader, "data/leaderboard.json")
         score_str=str(cur_player_data["cur_score"])
         # Reset game
         cur_player_data["cur_score"] = 0
         cur_player_data["attempt"] = 1
-        cur_player_data["cur_question"] = 0
+        cur_player_data["cur_question"] = 1
         cur_player_data["game_num"] += 1
         # Update players.json
         all_players_data = read_json_data("data/players.json")
         all_players_data = update_all_players_data(cur_player_data, all_players_data)
         write_json_data(all_players_data,"data/players.json")
+        
         return render_template("game_over.html", score_str=score_str, 
                                                  result_msg=result_msg, 
                                                  leader=leader, 
@@ -355,10 +340,10 @@ def leaderboard():
     """
     Module returns leaderboard.html.
     """
-    with open("data/leaderboard.json", "r") as json_leader_board:
-        leader = json.load(json_leader_board)
-    return render_template("leaderboard.html", leader=leader, 
-                                          title="Leaderboard")
+    leaderboard = read_json_data("data/leaderboard.json")
+    
+    return render_template("leaderboard.html", leaderboard=leaderboard, 
+                                               title="Leaderboard")
 
 @app.route('/instructions/')
 def instructions(): 
