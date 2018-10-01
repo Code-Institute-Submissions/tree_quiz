@@ -36,8 +36,34 @@ Features
 In this section, you should go over the different parts of your project, and describe each in a sentence or so.
 
 __Existing Features__
-
-
+* The home page greats the user with a brief intro, provides a text box to sign in, as well as links to the leaderboard and game instructions
+* Players.json file stores the game data for all players as a list of dictioaries. In the format of:
+       [{"cur_score": 0,
+         "attempt": 2, "name": "name1"
+         "cur_question": 5,
+         "high_score": 60,
+         "game_num": 2}] 
+* If the player signs in with a username already used it will load up the players data on record.
+* The username must be of the form "^[a-zA-Z0-9]+$". This requirment is set in the html code.
+* Once the player enters a username a brief welcome message is displayed, informing the player of their current game status. This allows the user to enter in a different username if they are a new player, before playing the game.
+* Each question's data is stored in a tree_lib.json as a list of dictioaries. in the format of:
+       [{"question": 1,
+         "tree_image": "/static/img/arbutus.jpg",
+         "tree_name": "arbutus"}]
+* As the game progresses the question number is incremented by one and the relevent image and tree_name/answer are retrieved using the question number.
+* The player is presented with the image of a tree, a brief request to enter the tree name, along with an input box for the answer and sumbit button.
+* The answer may not contain any spaces and must be of form "^[a-zA-Z0-9]+$". This requirment is set in the html code.
+* The player can keep track of their game with the progress states diplayed on screen, current question, attemp number and current score are displayed. The attempt number is hidden in smaller screen resolutions.
+* Once the player submits an answer the answer is processed, there data is updated in the players.json file and a feedback message is displayed on the screen.
+* If the player answers correctly a green tick and  congraditalry message is displayed and 'Next Question' button is made visible.
+* If the player answers incorrectly on their first attemp at the question, a red x with a message stating that their answer was incorrect and they have another attempt, is displayed,
+* If the player answers incorrectly on their second attempt at the question, a red x with a message stating the correct answer is displayed, along with the 'Next Question' button.
+* The player gets 10 points for every question answer correctly on their first attempt and 5 points for answered correctly on their second attempt.
+* Once the 10th question has been sumbmitted the player is presented with a Gam Over screen, displayed their final score and a a game feedback message. 
+* The feedback message compares the players current score to their high score on record as well as to the leaderboard and displays an approriete message.
+* The a 5 ranked leaderboard is also displayed. The leaderboard data is stored in leaderboard.json. To be included in the leaderbord the player must score higher than their high score on record and higher than the lowest score on the leaderboard.
+* If the player scores the same as their high score it does not make any changes, but if the score is the same as the lowest score on the leaderboard it knocks out the older player.
+* From the Game OVer screen the player can play the game again without having to reenter the username.
 
 __Features Left to Implement__
 * Include green/ read to indicate if the answers were wrong or right.
@@ -59,11 +85,18 @@ Technologies Used
     - __Boostrap Grid__ system was used for content arrangment and responsive behavour when moving between different screen sizes
     - __Boostrap Navbar__ was used for the main navigation. Collapsible menu was utilised for lower screen resolutions.
     - __Bootstrap Forms Controls__ were used for the user actions.
-* __Font-Awesome 5.3.1__ (https://use.fontawesome.com/releases/v5.3.1/css/all.css) was for the icons in the header and footer.
+* __Font-Awesome 5.3.1__ (https://use.fontawesome.com/releases/v5.3.1/css/all.css) was for the icons in the header, footer and quiz template.
 * __Unittest__ (https://docs.python.org/3/library/unittest.html) unit testing framework was used for the testing of none template rendering functions.
 
 Testing
 -----------------------
+
+__Code Validation__
+
+* __Python__ was validated using http://pep8online.com/. Both run.py and test_quiz.py are pep8 compliant.
+* __HTML__ was validated using https://validator.w3.org/. Due to the python code embeddeded in the HTML templates there were a number of errors.
+* __CSS__ was validated using https://jigsaw.w3.org/css-validator/validator. No  errors were found.
+* __Spelling and Grammer__ was validated using Google Docs.
 
 Deployment
 ------------------------
@@ -86,6 +119,7 @@ Leaderboard.json and players.json are updated during game play and so may differ
 
 Credits
 -----------------------------
+
 __Media__
 
 The photos used in this site were obtained from:

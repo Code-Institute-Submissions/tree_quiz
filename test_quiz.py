@@ -170,8 +170,8 @@ class TestQuiz(unittest.TestCase):
             hide_next_btn, \
             cur_player_data, \
             answer_state = run.process_answer(answer,
-                                                 tree_name,
-                                                 cur_player_data)
+                                              tree_name,
+                                              cur_player_data)
         self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
         self.assertFalse(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
@@ -190,8 +190,8 @@ class TestQuiz(unittest.TestCase):
             hide_next_btn, \
             cur_player_data, \
             answer_state = run.process_answer(answer,
-                                                 tree_name,
-                                                 cur_player_data)
+                                              tree_name,
+                                              cur_player_data)
         self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
         self.assertFalse(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
@@ -212,8 +212,8 @@ class TestQuiz(unittest.TestCase):
             hide_next_btn, \
             cur_player_data, \
             answer_state = run.process_answer(answer,
-                                                 tree_name,
-                                                 cur_player_data)
+                                              tree_name,
+                                              cur_player_data)
         self.assertEqual(feedback_msg, expected_feedback)
         self.assertTrue(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
@@ -231,8 +231,8 @@ class TestQuiz(unittest.TestCase):
             hide_next_btn, \
             cur_player_data, \
             answer_state = run.process_answer(answer,
-                                                 tree_name,
-                                                 cur_player_data)
+                                              tree_name,
+                                              cur_player_data)
         self.assertEqual(feedback_msg,
                          "Wrong again! Arbutus is the correct answer.")
         self.assertFalse(hide_next_btn)
