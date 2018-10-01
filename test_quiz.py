@@ -168,12 +168,14 @@ class TestQuiz(unittest.TestCase):
         answer = "arbutus"
         feedback_msg, \
             hide_next_btn, \
-            cur_player_data = run.process_answer(answer,
+            cur_player_data, \
+            answer_state = run.process_answer(answer,
                                                  tree_name,
                                                  cur_player_data)
         self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
         self.assertFalse(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
+        self.assertEqual(answer_state, 1)
 
         # Check: For correct answer, second attempt
         cur_player_data = {"name": "name1", "game_num": 1,
@@ -186,12 +188,14 @@ class TestQuiz(unittest.TestCase):
         answer = "arbutus"
         feedback_msg, \
             hide_next_btn, \
-            cur_player_data = run.process_answer(answer,
+            cur_player_data, \
+            answer_state = run.process_answer(answer,
                                                  tree_name,
                                                  cur_player_data)
         self.assertEqual(feedback_msg, "Arbutus is the correct answer!")
         self.assertFalse(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
+        self.assertEqual(answer_state, 1)
 
         # Check: For wrong answer, first attempt
         cur_player_data = {"name": "name1", "game_num": 1,
@@ -206,12 +210,14 @@ class TestQuiz(unittest.TestCase):
                              " but you still have a second try.")
         feedback_msg, \
             hide_next_btn, \
-            cur_player_data = run.process_answer(answer,
+            cur_player_data, \
+            answer_state = run.process_answer(answer,
                                                  tree_name,
                                                  cur_player_data)
         self.assertEqual(feedback_msg, expected_feedback)
         self.assertTrue(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
+        self.assertEqual(answer_state, 2)
         # Check: For wrong answer, first second attempt
         cur_player_data = {"name": "name1", "game_num": 1,
                            "cur_question": 1, "attempt": 2,
@@ -223,13 +229,15 @@ class TestQuiz(unittest.TestCase):
         answer = "birch"
         feedback_msg, \
             hide_next_btn, \
-            cur_player_data = run.process_answer(answer,
+            cur_player_data, \
+            answer_state = run.process_answer(answer,
                                                  tree_name,
                                                  cur_player_data)
         self.assertEqual(feedback_msg,
                          "Wrong again! Arbutus is the correct answer.")
         self.assertFalse(hide_next_btn)
         self.assertEqual(cur_player_data, expected_cur_player_data)
+        self.assertEqual(answer_state, 2)
 
     def test_add_to_leaderboard(self):
         """

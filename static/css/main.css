@@ -142,6 +142,27 @@
     text-align: right;
 }
 
+.correct_icon{
+    color: green;
+    font-size: 80px;
+    margin-top: 30px;
+}
+
+.wrong_icon{
+    color: red;
+    font-size: 80px;
+    margin-top: 30px;
+}
+
+.question_icon{
+    color: #cccccc;
+    font-size: 80px;
+    margin-top: 30px;
+}
+
+
+
+
 .message{
     margin-top: 30px;
 }

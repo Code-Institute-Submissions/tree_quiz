@@ -28,6 +28,13 @@
             </div>
             
             <div class="col-xs-12 col-md-3 col-lg-6 q_container"> 
+                {% if answer_state == 0 %}
+                <i class="far fa-question-circle question_icon"></i>
+                {% elif answer_state == 1 %}
+                <i class="far fa-check-circle correct_icon"></i>
+                {% else %}
+                <i class="far fa-times-circle wrong_icon"></i>
+                {% endif %}
                 <p class="message">{{ message }}</p>
                 {% if hide_next_btn %}
                     <div class="submit_container">
