@@ -4,6 +4,7 @@ from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
+
 # not tested
 def read_json_data(json_file):
     """
@@ -12,14 +13,18 @@ def read_json_data(json_file):
     with open(json_file, "r") as json_data:
             data = json.load(json_data)
     return data
-# not tested    
+
+
+# not tested
 def write_json_data(data, json_file):
     """
     Write data to json file
     """
-    with open(json_file, "w") as json_data:           
+    with open(json_file, "w") as json_data:
         json.dump(data, json_data)
-# not tested        
+
+
+# not tested
 def update_all_players_data(cur_player_data, all_players_data):
     """
     Updates all_players_data file with cur_player_data
@@ -31,107 +36,119 @@ def update_all_players_data(cur_player_data, all_players_data):
             break
     return all_players_data
 
+
 def get_cur_player_data(username, all_players_data):
     """
-    Module checks if a username is in the player database, 
+    Module checks if a username is in the player database,
     returns the users info or else creates user info for the new user.
     """
     username = username.lower()
     past_player = False
-    
+
     for obj in all_players_data:
         if obj["name"] == username:
             past_player = True
             cur_player_data = obj
-       
-    if past_player == False:
-        cur_player_data = {"name": username,"game_num": 1, 
-            "cur_question": 1, "attempt": 1, "cur_score": 0, "high_score": 0}
+
+    if not past_player:
+        cur_player_data = {"name": username, "game_num": 1,
+                           "cur_question": 1, "attempt": 1,
+                           "cur_score": 0, "high_score": 0}
         all_players_data.append(cur_player_data)
-    
+
     return cur_player_data, all_players_data
-    
+
+
 def get_welcome_msg(cur_player_data):
     """
-    Module returns the appropriete welcome message based on he users playing history.
-    """    
+    Module returns the welcome message based on he users playing history.
+    """
     if cur_player_data["cur_question"] > 1:
-        welcome_msg = "Welcome back {}. Looks like you left us mid game. You are currently on question {}." \
-                       .format(cur_player_data["name"], str(cur_player_data["cur_question"]))
-        # Reduce cur_question by 1, load question automaticaly increases by one later   
-        # cur_player_data["cur_question"] -= 1
+        welcome_msg = ("Welcome back {}. Looks like you left us mid game." +
+                       " You are currently on question {}.") \
+                       .format(cur_player_data["name"],
+                       str(cur_player_data["cur_question"]))
     elif cur_player_data["game_num"] != 1:
-        welcome_msg = "Welcome back {}. You have played this game {} times before." \
-                       .format(cur_player_data["name"], str(cur_player_data["game_num"]-1))
+        welcome_msg = ("Welcome back {}." +
+                       " You have played this game {} times before.") \
+                       .format(cur_player_data["name"],
+                       str(cur_player_data["game_num"] - 1))
     else:
-        welcome_msg = "Welcome {}. This looks like your first game.".format(cur_player_data["name"])
-    
+        welcome_msg = "Welcome {}. This looks like your first game." \
+                      .format(cur_player_data["name"])
+
     return welcome_msg, cur_player_data
- 
+
+
 def get_q_data(cur_question):
     """
     Module returns the tree name, url of tree image
     and max possible score for a given question number.
     """
-    
     quiz_data = read_json_data("data/tree_lib.json")
     max_score = cur_question*10
     for obj in quiz_data:
-        if obj["question"] == cur_question:  
+        if obj["question"] == cur_question:
             tree_name = obj["tree_name"]
             tree_image = obj["tree_image"]
-    
+
     return tree_name, tree_image, max_score
+
 
 def add_to_score(cur_player_data):
     """
     Module increments the users score by 10
-    if user answers question correctly on first attemp, or 
+    if user answers question correctly on first attemp, or
     by 5 if user answers correctly on second attempt
     """
     if cur_player_data["attempt"] == 1:
-       cur_player_data["cur_score"] += 10
+        cur_player_data["cur_score"] += 10
     else:
-       cur_player_data["cur_score"] += 5 
+        cur_player_data["cur_score"] += 5
     return cur_player_data
+
 
 def process_answer(answer, tree_name, cur_player_data):
     """
     Module checks if the users entered answer is correct,
-    and returns appropriete feedback message and whether to allow access to 
+    and returns feedback message and whether to allow access to
     next question button.
     """
     if answer == tree_name:
         cur_player_data = add_to_score(cur_player_data)
         cur_player_data["cur_question"] += 1
-        feedback_msg =  "{} is the correct answer!".format(tree_name.title())
+        feedback_msg = "{} is the correct answer!" \
+                       .format(tree_name.title())
         hide_next_btn = False
     elif answer != tree_name and cur_player_data["attempt"] == 1:
         cur_player_data["attempt"] = 2
-        feedback_msg =  "{} is not correct, but you still have a second try.".format(answer.title())
+        feedback_msg = "{} is not correct, but you still have a second try." \
+                       .format(answer.title())
         hide_next_btn = True
     else:
         cur_player_data["cur_question"] += 1
-        feedback_msg = "Wrong again! {} is the correct answer.".format(tree_name.title())
+        feedback_msg = "Wrong again! {} is the correct answer." \
+                       .format(tree_name.title())
         hide_next_btn = False
 
     return feedback_msg, hide_next_btn, cur_player_data
-        
+
+
 def add_to_leaderboard(cur_player_data, leader):
     """
-    Modules checks if the users current score is a personnel best 
+    Modules checks if the users current score is a personnel best
     and if that personnel best makes it onto a 5 person leaderboard.
     """
     made_leader = False
     len_leader = len(leader)
-    leader_scores=[]
-    
+    leader_scores = []
+
     name = cur_player_data["name"]
     score = cur_player_data["high_score"]
     game_num = cur_player_data["game_num"]
-    
+
     # Create a list of the scores on the leaderboard
-    for n in range(1, len(leader),3):
+    for n in range(1, len(leader), 3):
         leader_scores.append(leader[n])
 
     # Leader board empty
@@ -141,9 +158,9 @@ def add_to_leaderboard(cur_player_data, leader):
         leader.append(name)
         leader.append(score)
         leader.append(game_num)
-        
-    # Leaderboard not full    
-    elif len_leader <  15:
+
+    # Leaderboard not full
+    elif len_leader < 15:
         made_leader = True
         # Score less than scores on leaderboard
         # Add user to end of leaderboard
@@ -151,25 +168,21 @@ def add_to_leaderboard(cur_player_data, leader):
             leader.append(name)
             leader.append(score)
             leader.append(game_num)
-            
         # Score greater than scores on leaderboard
         # Working from highest to lowest, insert player into highest rank
         else:
             for n in range(1, len_leader-1, 3):
                 if score >= int(leader[n]):
-                    
                     leader.insert(n-1, game_num)
                     leader.insert(n-1, score)
                     leader.insert(n-1, name)
-
                     break
-            
     # Leaderboard full, but final score made it onto leaderboard
     # Working from highest to lowest, insert player into highest rank
     elif score >= min(leader_scores):
         made_leader = True
         del leader[len_leader-3:len_leader]
-        len_leader=len(leader)
+        len_leader = len(leader)
         # Score is equal to the lowest score on leaderboard
         if score == min(leader_scores):
                 leader.append(name)
@@ -179,71 +192,82 @@ def add_to_leaderboard(cur_player_data, leader):
         else:
             for n in range(1, len_leader, 3):
                 if score >= int(leader[n]):
-                    
                     leader.insert(n-1, game_num)
                     leader.insert(n-1, score)
                     leader.insert(n-1, name)
-    
                     break
 
     return made_leader, leader
-   
+
+
 def evaluate_result(cur_player_data, leader):
     """
     Module compares the users final result against there past scores
     and the leaderboard, returns appropriete message.
     """
     score = cur_player_data["cur_score"]
-    # Scored 0   
-    if score ==0:
+    # Scored 0
+    if score == 0:
         leader = leader
-        result_msg = "You can do better than 0. You should try again, I'm sure you have learned from your mistakes."
+        result_msg = ("You can do better than 0. You should try again," +
+                      " I'm sure you have learned from your mistakes.")
     # First game, full marks
     elif cur_player_data["game_num"] == 1 and score == 100:
         cur_player_data["high_score"] = score
         made_leader, leader = add_to_leaderboard(cur_player_data, leader)
-        result_msg = "Congradulations! You got top marks on your first game. Check out the leaderboard."
+        result_msg = ("Congradulations!" +
+                      " You got top marks on your first game." +
+                      " Check out the leaderboard.")
     # First game, scored between 0 and 100
     elif cur_player_data["game_num"] == 1 and score < 100:
         cur_player_data["high_score"] = score
         made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         # Score made it onto leaderboard
         if made_leader:
-            result_msg = "Excelent! First game and you made it on the leaderboard."
+            result_msg = ("Excelent!" +
+                          " First game and you made it on the leaderboard.")
         # Score did not make it onto leaderboard
         else:
-            result_msg = "Good first try. Have another game and try to make it onto leaderboard."
+            result_msg = ("Good first try." +
+                          " Have another game and try to" +
+                          " make it onto leaderboard.")
     # Played before, personnel best
     elif score > cur_player_data["high_score"]:
         cur_player_data["high_score"] = score
         made_leader, leader = add_to_leaderboard(cur_player_data, leader)
         # Score made it onto leaderboard
         if made_leader:
-            result_msg = "Excelent! You made it onto the leaderboard with this new personnel best."
+            result_msg = ("Excelent!" +
+                          " You made it onto the leaderboard" +
+                          " with this new personnel best.")
         # Score did not make it onto leaderboard
         else:
             result_msg = "You are improving. Keep trying to get top marks."
     else:
         # Scored less than personnel high score
         leader = leader
-        result_msg = "Good job, but you didn't beat your own top score of {}".format(str(cur_player_data["high_score"]))
-    
+        result_msg = "Good job, but you didn't beat your own top score of {}" \
+                     .format(str(cur_player_data["high_score"]))
+
     return result_msg, cur_player_data, leader
-    
+
+
 @app.route('/')
 def index():
     """
     Home page
     """
-    return render_template("index.html", welcome_msg="", 
-                                         hide_start_btn = True,
-                                         username="",
-                                         title="Sign In")
+    return render_template("index.html",
+                           welcome_msg="",
+                           hide_start_btn=True,
+                           username="",
+                           title="Sign In")
+
 
 @app.route('/check_username', methods=['GET', 'POST'])
 def check_username():
     """
-    Module accepts POST of username from index.html and return index.html 
+    Module accepts POST of username from index.html and return index.html
     displaying appropriete welcome message and the next question button when
     required.
     """
@@ -251,72 +275,91 @@ def check_username():
     if request.method == "POST":
         username = request.form["username"]
         all_players_data = read_json_data("data/players.json")
-        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
-        write_json_data(all_players_data,"data/players.json")
+        cur_player_data, \
+            all_players_data = get_cur_player_data(username, all_players_data)
+        write_json_data(all_players_data, "data/players.json")
         welcome_msg, cur_player_data = get_welcome_msg(cur_player_data)
 
-        return render_template("index.html", welcome_msg=welcome_msg, 
-                                             hide_start_btn=False, 
-                                             username=username,
-                                             title="Welcome")
-        
+        return render_template("index.html",
+                               welcome_msg=welcome_msg,
+                               hide_start_btn=False,
+                               username=username,
+                               title="Welcome")
+
+
 @app.route('/question/<username>', methods=['GET', 'POST'])
 def question(username):
     """
-    Module returns either the next question or answer feedback displayed on quiz.html
-    if the current question is less than 10 or game_over.html current quesion is 10. 
+    Module returns either the next question or answer feedback
+    displayed on quiz.html if the current question is less
+    than 10 or game_over.html current quesion is 10.
     """
     all_players_data = read_json_data("data/players.json")
-    cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+    cur_player_data, \
+        all_players_data = get_cur_player_data(username, all_players_data)
     title = "Question " + str(cur_player_data["cur_question"])
-    
+
     # For submitting answer
     if request.method == "POST":
         answer = request.form["answer"].lower()
-        tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
+        tree_name, tree_image, \
+            max_score = get_q_data(cur_player_data["cur_question"])
         cur_question = cur_player_data["cur_question"]
         # Process_answer() returns cur_player_data for the next question
-        message, hide_next_btn, cur_player_data = process_answer(answer, tree_name, cur_player_data)
+        message, hide_next_btn, \
+            cur_player_data = process_answer(answer,
+                                             tree_name,
+                                             cur_player_data)
         # Update players.json
         all_players_data = read_json_data("data/players.json")
-        all_players_data = update_all_players_data(cur_player_data, all_players_data)
-        write_json_data(all_players_data,"data/players.json")
-        
-        return render_template("quiz.html", tree_image=tree_image, 
-                                            cur_score=cur_player_data["cur_score"], 
-                                            attempt=cur_player_data["attempt"], 
-                                            cur_question=cur_question, 
-                                            max_score=max_score,
-                                            message=message,
-                                            hide_next_btn=hide_next_btn,
-                                            username=username,
-                                            title=title)
-    # For next question    
-    elif request.method == "GET" and cur_player_data["cur_question"] <= 10: 
+        all_players_data = update_all_players_data(cur_player_data,
+                                                   all_players_data)
+        write_json_data(all_players_data, "data/players.json")
+
+        return render_template("quiz.html",
+                               tree_image=tree_image,
+                               cur_score=cur_player_data["cur_score"],
+                               attempt=cur_player_data["attempt"],
+                               cur_question=cur_question,
+                               max_score=max_score,
+                               message=message,
+                               hide_next_btn=hide_next_btn,
+                               username=username,
+                               title=title)
+
+    # For next question
+    elif request.method == "GET" and cur_player_data["cur_question"] <= 10:
         cur_player_data["attempt"] = 1
-        tree_name, tree_image, max_score = get_q_data(cur_player_data["cur_question"])
+        tree_name, tree_image, \
+            max_score = get_q_data(cur_player_data["cur_question"])
         # Update players.json
         all_players_data = read_json_data("data/players.json")
-        all_players_data = update_all_players_data(cur_player_data, all_players_data)
-        write_json_data(all_players_data,"data/players.json")
-       
-        return render_template("quiz.html", tree_image=tree_image, 
-                                                cur_score=cur_player_data["cur_score"], 
-                                                attempt=cur_player_data["attempt"], 
-                                                cur_question=cur_player_data["cur_question"], 
-                                                max_score=max_score,
-                                                message="What is the name of this tree?",
-                                                hide_next_btn=True,
-                                                username=username,
-                                                title=title)
-    # For game over                                           
+        all_players_data = update_all_players_data(cur_player_data,
+                                                   all_players_data)
+        write_json_data(all_players_data, "data/players.json")
+
+        return render_template("quiz.html",
+                               tree_image=tree_image,
+                               cur_score=cur_player_data["cur_score"],
+                               attempt=cur_player_data["attempt"],
+                               cur_question=cur_player_data["cur_question"],
+                               max_score=max_score,
+                               message="What is the name of this tree?",
+                               hide_next_btn=True,
+                               username=username,
+                               title=title)
+
+    # For game over
     elif request.method == "GET" and cur_player_data["cur_question"] > 10:
         all_players_data = read_json_data("data/players.json")
-        cur_player_data, all_players_data = get_cur_player_data(username, all_players_data)
+        cur_player_data, \
+            all_players_data = get_cur_player_data(username,
+                                                   all_players_data)
         leader = read_json_data("data/leaderboard.json")
-        result_msg, cur_player_data, leader = evaluate_result(cur_player_data, leader)
+        result_msg, cur_player_data, \
+            leader = evaluate_result(cur_player_data, leader)
         write_json_data(leader, "data/leaderboard.json")
-        score_str=str(cur_player_data["cur_score"])
+        score_str = str(cur_player_data["cur_score"])
         # Reset game
         cur_player_data["cur_score"] = 0
         cur_player_data["attempt"] = 1
@@ -324,34 +367,40 @@ def question(username):
         cur_player_data["game_num"] += 1
         # Update players.json
         all_players_data = read_json_data("data/players.json")
-        all_players_data = update_all_players_data(cur_player_data, all_players_data)
-        write_json_data(all_players_data,"data/players.json")
-        
-        return render_template("game_over.html", score_str=score_str, 
-                                                 result_msg=result_msg, 
-                                                 leader=leader, 
-                                                 username=username,
-                                                 title="Game Over")
-                                                
+        all_players_data = update_all_players_data(cur_player_data,
+                                                   all_players_data)
+        write_json_data(all_players_data, "data/players.json")
+
+        return render_template("game_over.html",
+                               score_str=score_str,
+                               result_msg=result_msg,
+                               leader=leader,
+                               username=username,
+                               title="Game Over")
     return redirect('/')
-    
+
+
 @app.route('/leaderboard', methods=['GET', 'POST'])
-def leaderboard(): 
+def leaderboard():
     """
     Module returns leaderboard.html.
     """
     leaderboard = read_json_data("data/leaderboard.json")
-    
-    return render_template("leaderboard.html", leaderboard=leaderboard, 
-                                               title="Leaderboard")
+
+    return render_template("leaderboard.html",
+                           leaderboard=leaderboard,
+                           title="Leaderboard")
+
 
 @app.route('/instructions/')
-def instructions(): 
+def instructions():
     """
     Module returns instructions.html.
-    """    
-    return render_template("instructions.html", title="Instructions") 
-                                          
+    """
+    return render_template("instructions.html",
+                           title="Instructions")
+
+
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
             port=int(os.environ.get('PORT')),
