@@ -57,7 +57,7 @@ class TestQuiz(unittest.TestCase):
         Tests test_get_q_data(question), which returns the tree name, url of tree image
         and max possible score for a given question number.
         """
-        # Check if funciton gets the correct q data
+        # Check if function gets the correct q data
         
         self.assertEqual(("arbutus", "/static/img/arbutus.jpg", 10), run.get_q_data(1))
         self.assertEqual(("ash", "/static/img/ash.jpg", 20), run.get_q_data(2))
@@ -66,15 +66,15 @@ class TestQuiz(unittest.TestCase):
     def test_add_to_score(self):
         """
         Tests add_to_score, which increments the users score by 10
-        if user answers question correctly on first attemp, or 
+        if user answers question correctly on first attempt, or 
         by 5 if user answers correctly on second attempt
         """
-        # Check current score incrented by 10 if attempt = 1
+        # Check current score increased by 10 if attempt = 1
         cur_player_data = {"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 1, "cur_score": 0, "high_score": 0}
         new_cur_player_data = run.add_to_score(cur_player_data)
         self.assertEqual(new_cur_player_data["cur_score"], 10)
-        # Check current score incrented by 5 if attempt > 1
+        # Check current score increased by 5 if attempt > 1
         cur_player_data = {"name": "name1","game_num": 0, 
             "cur_question": 0, "attempt": 2, "cur_score": 10, "high_score": 0}
         new_cur_player_data = run.add_to_score(cur_player_data)
@@ -83,7 +83,7 @@ class TestQuiz(unittest.TestCase):
     def test_process_answer(self):
         """
         Tests process_answer(), which checks if the users entered answer is correct,
-        and returns appropriete feedback message and whether to allow access to 
+        and returns appropriate feedback message and whether to allow access to 
         next question button.
         """
         # Check: For correct answer, first attempt
@@ -199,7 +199,7 @@ class TestQuiz(unittest.TestCase):
     def test_evaluate_result(self):
         """
         Tests evaluate_results(), which compares the users final result 
-        against there past scores and the leaderboard, returns appropriete message.
+        against their past scores and the leaderboard, returns appropriate message.
         """
         # Check: Player scores 0
         cur_player_data_old = {"name": "name1","game_num": 0, 
@@ -217,7 +217,7 @@ class TestQuiz(unittest.TestCase):
         cur_player_data_old = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 100, "high_score": 0}
         leader_old = []
-        expected_msg = "Congradulations! You got top marks on your first game. Check out the leaderboard." 
+        expected_msg = "Congratulations! You got top marks on your first game. Check out the leaderboard." 
         expected_cur_player_data = {"name": "name1","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 100, "high_score": 100}
         expected_leader = ['name1', 100, 1]    
@@ -232,7 +232,7 @@ class TestQuiz(unittest.TestCase):
         cur_player_data_old = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 0}
         leader_old =["name1", 100, 1, "name2", 90, 1, "name3", 30, 1, "name4", 20, 1, "name5", 10, 0]
-        expected_msg = "Excelent! First game and you made it on the leaderboard." 
+        expected_msg = "Excellent! First game and you made it on the leaderboard." 
         expected_cur_player_data = {"name": "name6","game_num": 1, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 10}
         expected_leader = ["name1", 100, 1, "name2", 90, 1, "name3", 30, 1, "name4", 20, 1, "name6", 10, 1]
@@ -277,7 +277,7 @@ class TestQuiz(unittest.TestCase):
         cur_player_data_old = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 5}
         leader_old =["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name5", 10, 0]
-        expected_msg = "Excelent! You made it onto the leaderboard with this new personnel best."
+        expected_msg = "Excellent! You made it onto the leaderboard with this new personal best."
         expected_cur_player_data = {"name": "name6","game_num": 2, 
             "cur_question": 0, "attempt": 1, "cur_score": 10, "high_score": 10}
         expected_leader = ["name1", 100, 0, "name2", 90, 0, "name3", 30, 0, "name4", 20, 0, "name6", 10, 2]
@@ -305,7 +305,7 @@ class TestQuiz(unittest.TestCase):
         
     def test_get_welcome_msg(self):
         """
-        Tests get_welcome_msg(), which returns the appropriete welcome message based
+        Tests get_welcome_msg(), which returns the appropriate welcome message based
         on the users playing history.
         """
         # New player
@@ -336,4 +336,5 @@ class TestQuiz(unittest.TestCase):
             "cur_question": 1, "attempt": 1, "cur_score": 0, "high_score": 0}
         welcome_msg, cur_player_data = run.get_welcome_msg(cur_player_data)
         self.assertEqual((welcome_msg, cur_player_data), (expected_welcome_msg, expected_cur_player_data))
+
 
