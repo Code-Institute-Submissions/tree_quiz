@@ -1,4 +1,4 @@
-/* ------------------------------------------------------Base Styleing*/
+/* ------------------------------------------------------Base Styling*/
 .navbar-default .navbar-brand {
     color: white;
 }
@@ -83,7 +83,7 @@
     border-color: #c68c53;
 }
 
-/* ------------------------------------------------------Index Styleing*/
+/* ------------------------------------------------------Index Styling*/
 .index_content{
     text-align: center;
 }
@@ -121,7 +121,7 @@
     border-color: #c68c53;
 }
 
-/* ------------------------------------------------------Quiz Styleing*/
+/* ------------------------------------------------------Quiz Styling*/
 .all-question_content{
     margin-top: 30px;
     margin-bottom: 30px;
@@ -177,7 +177,7 @@
     border-color: #c68c53;
 }
 
-/* ------------------------------------------------------Game Over Styleing*/
+/* ------------------------------------------------------Game Over Styling*/
 .leaderboard-table-game-over{
     margin-bottom: 10px;
     text-align: center;
@@ -189,7 +189,7 @@
     border-color: #c68c53;
 }
 
-/* ------------------------------------------------------Leader Styleing*/
+/* ------------------------------------------------------Leader Styling*/
 
 .leader_content {
     text-align: center;
