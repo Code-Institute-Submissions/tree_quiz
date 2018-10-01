@@ -1,61 +1,51 @@
 [{
         "question": 1,
         "tree_image": "/static/img/arbutus.jpg",
-        "tree_name": "arbutus",
-        "hint": "arbutus hint"
+        "tree_name": "arbutus"
     },
     {
         "question": 2,
         "tree_image": "/static/img/ash.jpg",
-        "tree_name": "ash",
-        "hint": "ash hint"
+        "tree_name": "ash"
     },
     {
         "question": 3,
         "tree_image": "/static/img/birch.jpg",
-        "tree_name": "birch",
-        "hint": "birch hint"
+        "tree_name": "birch"
     },
     {
         "question": 4,
         "tree_image": "/static/img/hawthorn.jpg",
-        "tree_name": "hawthorn",
-        "hint": "hawthorn hint"
+        "tree_name": "hawthorn"
     },
     {
         "question": 5,
         "tree_image": "/static/img/hazel.jpg",
-        "tree_name": "hazel",
-        "hint": "hazel hint"
+        "tree_name": "hazel"
     },
     {
         "question": 6,
         "tree_image": "/static/img/holly.jpg",
-        "tree_name": "holly",
-        "hint": "holly hint"
+        "tree_name": "holly"
     },
     {
         "question": 7,
         "tree_image": "/static/img/oak.jpg",
-        "tree_name": "oak",
-        "hint": "oak hint"
+        "tree_name": "oak"
     },
     {
         "question": 8,
         "tree_image": "/static/img/pine.jpg",
-        "tree_name": "pine",
-        "hint": "pine hint"
+        "tree_name": "pine"
     },
     {
         "question": 9,
         "tree_image": "/static/img/willow.jpg",
-        "tree_name": "willow",
-        "hint": "willow hint"
+        "tree_name": "willow"
     },
     {
         "question": 10,
         "tree_image": "/static/img/yew.jpg",
-        "tree_name": "yew",
-        "hint": "yew hint"
+        "tree_name": "yew"
     }
 ]
