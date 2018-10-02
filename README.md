@@ -2,7 +2,7 @@ Practical Python: Tree Quiz
 ============================
  
 This is the Milestone Project in Practical Python module for the Code Institutes Diploma in Software Development.
-The porject shows my understanding and capabilities in developing web applications using Python, HTML, CSS and JavaScript.
+The project shows my understanding and capabilities in developing web applications using Python, HTML, CSS and JavaScript.
 
 The Tree Quiz is a pictorial quiz, where the user is asked to identify the native Irish trees shown in 10 pictures. 
 The user and the users game playing history is stored, so that the user can leave the game and return at any stage by simply signing in with the same username. 
@@ -79,6 +79,7 @@ __Features Left to Implement__
 * Develop code so that the images are not shown in the same sequence during each game. Some use of the random function, should be used.
 * Include more trees, make the game longer.
 * Display a hint for the second attempt at a question.
+* Have a section giving detailed information on each of the tree species. 
 * On the Game Over screen show all the pictures, displaying which ones were answered correctly and which ones were wrong. Use a list to save if the user got each question wrong of right.
 
 Technologies Used
@@ -118,8 +119,7 @@ The tests are written quite explicitly, to ensure it is clear as to what each te
 In run.py there are 10 functions that do not render html templates. 8 of these have automated tests written in test_quiz.py. The other 2 use text book code to read and write to .json files.
 As the .json files would be constantly changing, these were manually tested. For all template rendering functions manual testing was performed.
 
-The automated test_quiz.py file can be found at: 
-
+The automated test_quiz.py file can be found at:  
 https://github.com/dcasey720/tree_quiz/blob/master/test_quiz.py
 
 __Visual Testing__
@@ -145,7 +145,7 @@ __Manual Testing__
 
 The following test were performed manually. Care was taken that all relevant messages were correctly displayed.
 During initial testing it was noted that if the user refreshed the page during game play that questions could be skipped, 
-and even increment the users score without entering an answer. The function was changed in run.py to corrrect this bug.
+and even increment the users score without entering an answer. The function was changed in run.py to correct this bug.
 
 
 |                                   | Chrome (Desktop) | Edge (Desktop) | Chrome (Mobile) | Samsung Internet (Mobile)|
@@ -179,7 +179,7 @@ and even increment the users score without entering an answer. The function was 
 | Sign in Btn                       | OK               | OK             | OK              | OK                       |
 | Refresh (reloads instructions.html| OK               | OK             | OK              | OK                       |
 
-Multiplayer paralelel play was tested by signing in with the two usernames in different browsers (Chrome & Edge) and answering questions at the same time.
+Multiplayer parallel play was tested by signing in with the two usernames in different browsers (Chrome & Edge) and answering questions at the same time.
 Players.json updated correctly without the seperate games conflicting.
 It was also tested if the same username was playing on two different browsers at the same time. The player would be unaware except that questions would be skipped as they are already been answered by the other browser.
 
@@ -187,9 +187,10 @@ Deployment
 ------------------------
 
 To deploy the app requires flask to be installed on the machine and the machine should be running python 3.4.3.
+It was noted in development that if python version was set to the newer python 3.6, that the flask framework could not be accessed.
 All requirements can be found in https:  
-//github.com/dcasey720/tree_quiz/blob/master/requirements.txt
-It was noted in development that if python verion was set to the newer python 3.6, that the flask framwork could not be acceessed.
+//github.com/dcasey720/tree_quiz/blob/master/requirements.txt  
+
 
 __Data Folder__
 
@@ -197,20 +198,24 @@ The data folder contains the dynamic .json files to store game play.
 Leaderboard.json and players.json are updated with every game. 
 For the the initial game both these must be occupied with an empty list [].
 
+Data folder can be found at:  
 https://github.com/dcasey720/tree_quiz/blob/master/data/tree_lib.json
  
 
 __Static Folder__
 
 Contains the main.css file for styling within the css folder, all the images for the quiz as well as template images.
-The static folder also contains tree_lib.json, a list of dictionaries of the questions and address to the respectful images.
+The static folder also contains tree_lib.json, a list of dictionaries of the questions and address to the respectful images. 
+Originally this data was stored in the data folder with the other .json files, but as it should remain static it was moved into the static folder.
 
 Static folder can be found at:  
 https://github.com/dcasey720/tree_quiz/tree/master/static
 
 __Templates Folder__
 
-The templates folder contains all the html templates for the front end of the application. It can be found at:  
+The templates folder contains all the html templates for the front end of the application. 
+
+Template folder can be found at:  
 https://github.com/dcasey720/tree_quiz/tree/master/templates
 
 __Hosting__
@@ -244,3 +249,5 @@ __Media__
 The photos used in this site were obtained from:
 
 https://treecouncil.ie/tree-advice/native-species/
+
+
