@@ -187,9 +187,31 @@ Deployment
 ------------------------
 
 To deploy the app requires flask to be installed on the machine and the machine should be running python 3.4.3.
+All requirements can be found in https:  
+//github.com/dcasey720/tree_quiz/blob/master/requirements.txt
 It was noted in development that if python verion was set to the newer python 3.6, that the flask framwork could not be acceessed.
-Run.py requires a number of .json files to be stored in /data folder from the route folder. Tree_lib.json is static and should not be changed. 
-Leaderboard.json and players.json are updated with every game. For the the initial game both these must be occupied with an empty list []. 
+
+__Data Folder__
+
+The data folder contains the dynamic .json files to store game play. 
+Leaderboard.json and players.json are updated with every game. 
+For the the initial game both these must be occupied with an empty list [].
+
+https://github.com/dcasey720/tree_quiz/blob/master/data/tree_lib.json
+ 
+
+__Static Folder__
+
+Contains the main.css file for styling within the css folder, all the images for the quiz as well as template images.
+The static folder also contains tree_lib.json, a list of dictionaries of the questions and address to the respectful images.
+
+Static folder can be found at:  
+https://github.com/dcasey720/tree_quiz/tree/master/static
+
+__Templates Folder__
+
+The templates folder contains all the html templates for the front end of the application. It can be found at:  
+https://github.com/dcasey720/tree_quiz/tree/master/templates
 
 __Hosting__
 

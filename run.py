@@ -82,7 +82,7 @@ def get_q_data(cur_question):
     Module returns the tree name, url of tree image
     and max possible score for a given question number.
     """
-    quiz_data = read_json_data("data/tree_lib.json")
+    quiz_data = read_json_data("static/data/tree_lib.json")
     max_score = cur_question*10
     for obj in quiz_data:
         if obj["question"] == cur_question:
