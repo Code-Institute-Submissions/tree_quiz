@@ -2,7 +2,7 @@ import unittest
 import run
 import os
 import json
-from flask import Flask, render_template, request
+from flask import Flask
 
 
 class TestQuiz(unittest.TestCase):
